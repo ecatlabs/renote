@@ -1,0 +1,26 @@
+[package]
+name = "renote"
+version = "0.1.0"
+authors = ["David Ko <dko@suse.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = "2"
+log = "0.4"
+pretty_env_logger = "0.4"
+lazy_static = "1.4"
+anyhow = "1.0"
+dirs = "3.0"
+semver = "0.11"
+hubcaps = { git = "https://github.com/innobead/hubcaps" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_yaml = "0.8"
+async-trait = "0.1"
+reqwest = { version = "0.11", features = ["json"] }
+tokio = { version = "1", features = ["full"] }
+tokio-stream = "0.1.5"
+maplit = "1.0"
+tera = { version = "1", default-features = false }

@@ -1,0 +1,20 @@
+owner: longhorn
+repo: longhorn
+token: ""
+state: closed
+note: >-
+  # Release note start
+  {content}
+  # Release note end
+milestone: v1.1.1
+show_contributor: true
+labels: [ ]
+exclude_labels:
+  - kind/test
+  - kind/task
+  - wontfix
+highlight_labels:
+  - highlight
+  - kind/enhancement
+  - kind/bug
+  - kind/upstream-issue
