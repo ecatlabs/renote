@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Default)]
 pub(crate) struct IssueSearchConfig {
@@ -11,7 +12,7 @@ pub(crate) struct IssueSearchConfig {
     pub labels: Option<Vec<String>>,
     pub any_labels: Option<Vec<String>>,
     pub exclude_labels: Option<Vec<String>>,
-    pub highlight_labels: Option<Vec<String>>,
+    pub highlight_labels: Option<HashMap<String, String>>,
     pub show_contributor: bool,
 }
 

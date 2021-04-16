@@ -1139,6 +1139,7 @@ dependencies = [
  "log",
  "maplit",
  "pretty_env_logger",
+ "regex",
  "reqwest",
  "semver",
  "serde",

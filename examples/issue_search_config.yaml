@@ -3,18 +3,19 @@ repo: longhorn
 token: ""
 state: closed
 note: >-
-  # Release Note
+  ## Release Note
+  ## Upgrade
+
   {content}
 milestone: v1.1.1
 show_contributor: true
 any_labels: [ ]
 labels: [ ]
 exclude_labels:
-  - kind/test
+  - area/test
   - kind/task
   - wontfix
 highlight_labels:
-  - highlight
-  - kind/enhancement
-  - kind/bug
-  - kind/upstream-issue
+  kind/bug: Bugs (index=2)
+  kind/enhancement: Enhancements (index=1)
+  highlight: Highlights (index=0)

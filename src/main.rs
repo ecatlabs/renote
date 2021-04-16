@@ -3,8 +3,6 @@
 #[macro_use]
 extern crate maplit;
 
-use std::process::exit;
-
 use clap::{App, Arg};
 
 use crate::cmd::issue::*;
@@ -75,6 +73,4 @@ async fn main() {
             .await
             .expect("expect command");
     }
-
-    exit(1);
 }

@@ -135,7 +135,7 @@ impl CommandTrait for CreateNoteCommand {
                         .unwrap()
                         .collect::<Vec<_>>()
                         .into_iter()
-                        .map(|it| it.to_string())
+                        .map(|it| (it.to_string(), it.to_string()))
                         .collect(),
                 ),
                 show_contributor: true,

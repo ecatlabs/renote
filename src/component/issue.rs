@@ -156,7 +156,14 @@ impl IssueComponentTrait for IssueComponent {
         search_query.push(format!("is:{}", &config.state));
 
         let mut labels = config.labels.clone().unwrap_or(vec![]);
-        labels.append(&mut config.highlight_labels.clone().unwrap_or(vec![]));
+        let mut highlight_labels: Vec<_> = config
+            .highlight_labels
+            .clone()
+            .unwrap_or(hashmap! {})
+            .keys()
+            .cloned()
+            .collect();
+        labels.append(&mut highlight_labels);
 
         for label in &labels {
             search_query.push(format!("label:{}", label))
