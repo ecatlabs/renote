@@ -3,11 +3,11 @@ repo: longhorn
 token: ""
 state: closed
 note: >-
-  # Release note start
+  # Release Note
   {content}
-  # Release note end
 milestone: v1.1.1
 show_contributor: true
+any_labels: [ ]
 labels: [ ]
 exclude_labels:
   - kind/test

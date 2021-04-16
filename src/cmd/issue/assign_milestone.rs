@@ -3,9 +3,9 @@ use clap::{App, Arg, ArgMatches, SubCommand};
 
 use crate::cmd::{CmdResult, CommandSetting, CommandTrait};
 
-pub const CMD_ASSIGN_MILESTONE: &str = "assign-milestone";
+pub(crate) const CMD_ASSIGN_MILESTONE: &str = "assign-milestone";
 
-pub struct AssignMilestoneCommand;
+pub(crate) struct AssignMilestoneCommand;
 
 impl AssignMilestoneCommand {
     pub fn new() -> Self {

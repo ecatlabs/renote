@@ -1,15 +1,15 @@
-use anyhow::Result;
 use async_trait::async_trait;
 use hubcaps::issues::{Issue, IssueListOptions, Sort};
-
 use hubcaps::search::{IssuesSort, SearchIssuesOptions};
+use hubcaps::users::User;
 use tokio_stream::StreamExt;
 
 use crate::component::to_issue_state;
 use crate::config::IssueSearchConfig;
+use crate::result::Result;
 use crate::util::create_github_client;
 
-pub struct IssueComponent;
+pub(crate) struct IssueComponent;
 
 impl IssueComponent {
     pub fn new() -> impl IssueComponentTrait {
@@ -18,12 +18,12 @@ impl IssueComponent {
 }
 
 #[async_trait]
-pub trait IssueComponentTrait {
+pub(crate) trait IssueComponentTrait {
     async fn search_issues(&self, config: &IssueSearchConfig) -> Result<Vec<Issue>>;
-    async fn search_issues_by_label(
+    async fn search_issues_by_labels(
         &self,
         config: &IssueSearchConfig,
-        label: &String,
+        labels: &Vec<String>,
     ) -> Result<Vec<Issue>>;
     async fn search_issues_by_query(
         &self,
@@ -35,28 +35,31 @@ pub trait IssueComponentTrait {
 #[async_trait]
 impl IssueComponentTrait for IssueComponent {
     async fn search_issues(&self, config: &IssueSearchConfig) -> Result<Vec<Issue>> {
-        let mut labels = config.labels.clone().unwrap_or(vec![]);
-        labels.append(&mut config.highlight_labels.clone().unwrap_or(vec![]));
-
         let mut issues: Vec<Issue> = vec![];
-        for label in labels {
-            let mut found_issues = self.search_issues_by_label(config, &label).await?;
+
+        let mut found_issues = self
+            .search_issues_by_labels(config, &config.labels.clone().unwrap_or(vec![]))
+            .await?;
+        issues.append(&mut found_issues);
+
+        for label in config.any_labels.clone().unwrap_or(vec![]) {
+            let mut found_issues = self.search_issues_by_labels(config, &vec![label]).await?;
             issues.append(&mut found_issues);
         }
 
         Ok(issues)
     }
 
-    async fn search_issues_by_label(
+    async fn search_issues_by_labels(
         &self,
         config: &IssueSearchConfig,
-        label: &String,
+        labels: &Vec<String>,
     ) -> Result<Vec<Issue>> {
         let client = create_github_client(&config.token)?;
         let repo = client.repo(config.owner.clone(), config.repo.clone());
 
         let search_options = IssueListOptions::builder()
-            .labels(vec![label])
+            .labels(labels.clone())
             .state(to_issue_state(&config.state))
             .sort(Sort::Created)
             .build();
@@ -64,9 +67,48 @@ impl IssueComponentTrait for IssueComponent {
         let issues: Vec<_> = repo
             .issues()
             .iter(&search_options)
-            .filter(|it| it.is_ok())
             .filter_map(|it| {
-                let issue = it.unwrap();
+                let issue = it.unwrap_or(Issue {
+                    id: 0,
+                    url: "".to_string(),
+                    repository_url: "".to_string(),
+                    labels_url: "".to_string(),
+                    comments_url: "".to_string(),
+                    events_url: "".to_string(),
+                    html_url: "".to_string(),
+                    number: 0,
+                    state: "".to_string(),
+                    title: "".to_string(),
+                    body: None,
+                    user: User {
+                        login: "".to_string(),
+                        id: 0,
+                        avatar_url: "".to_string(),
+                        gravatar_id: "".to_string(),
+                        url: "".to_string(),
+                        html_url: "".to_string(),
+                        followers_url: "".to_string(),
+                        following_url: "".to_string(),
+                        gists_url: "".to_string(),
+                        starred_url: "".to_string(),
+                        subscriptions_url: "".to_string(),
+                        organizations_url: "".to_string(),
+                        repos_url: "".to_string(),
+                        events_url: "".to_string(),
+                        received_events_url: "".to_string(),
+                        site_admin: false,
+                    },
+                    labels: vec![],
+                    assignee: None,
+                    locked: false,
+                    comments: 0,
+                    pull_request: None,
+                    closed_at: None,
+                    created_at: "".to_string(),
+                    updated_at: "".to_string(),
+                    assignees: vec![],
+                    milestone: None,
+                });
 
                 // filter milestone
                 if let Some(milestone) = &config.milestone {

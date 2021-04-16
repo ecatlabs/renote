@@ -1,25 +1,27 @@
 use std::collections::HashMap;
 use std::env::args;
 
-use anyhow::Result;
 use async_trait::async_trait;
 use clap::{App, ArgMatches, SubCommand};
 
-pub mod issue;
-pub mod note;
+use crate::log::init_log;
+use crate::result::Result;
 
-pub type CmdResult = Result<()>;
-pub type CmdBox = Box<dyn CommandTrait + Send + Sync>;
-pub type CmdGroup = HashMap<&'static str, CmdBox>;
+pub(crate) mod issue;
+pub(crate) mod note;
 
-pub struct CommandSetting {
+pub(crate) type CmdResult = Result<()>;
+pub(crate) type CmdBox = Box<dyn CommandTrait + Send + Sync>;
+pub(crate) type CmdGroup = HashMap<&'static str, CmdBox>;
+
+pub(crate) struct CommandSetting {
     name: &'static str,
     about: &'static str,
     commands: CmdGroup,
 }
 
 #[async_trait]
-pub trait CommandTrait {
+pub(crate) trait CommandTrait {
     fn setting(&self) -> &CommandSetting;
 
     fn app<'a, 'b>(&self) -> App<'a, 'b> {
@@ -36,6 +38,10 @@ pub trait CommandTrait {
     }
 
     async fn process<'a>(&self, matches: &ArgMatches<'a>) -> CmdResult {
+        if let Some(log_level) = matches.value_of("log-level") {
+            init_log(log_level)?;
+        }
+
         if let (command_name, Some(sub_matches)) = matches.subcommand() {
             self.setting()
                 .commands
@@ -52,7 +58,7 @@ pub trait CommandTrait {
     }
 }
 
-pub fn get_app_matches<'a, 'b>(app: App<'a, 'b>) -> ArgMatches<'a> {
+pub(crate) fn get_app_matches<'a, 'b>(app: App<'a, 'b>) -> ArgMatches<'a> {
     let mut args = args();
     match args {
         _ if args.len() == 1 => {
@@ -63,6 +69,6 @@ pub fn get_app_matches<'a, 'b>(app: App<'a, 'b>) -> ArgMatches<'a> {
     }
 }
 
-pub fn create_cmd(c: CmdBox) -> CmdBox {
+pub(crate) fn create_cmd(c: CmdBox) -> CmdBox {
     c
 }

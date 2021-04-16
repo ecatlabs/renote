@@ -10,7 +10,7 @@ help:
 
 .PHONY: test
 test: ## Run tests
-	cargo test $(CARGO_OPTS) --workspace --exclude=huber-generator
+	cargo test $(CARGO_OPTS)
 
 .PHONY: fmt
 fmt: ## Format & Lint codes
@@ -24,11 +24,11 @@ fix:  ## Fix code
 .PHONY: udep
 udep: ## Check undepedencies
 	cargo install cargo-udeps --locked
-	cargo +nightly udeps  --workspace --exclude=huber-generator
+	cargo +nightly udeps
 
 .PHONY: build
 build: fmt ## Build binaries
-	cargo build $(CARGO_OPTS) --workspace --exclude=huber-generator
+	cargo build $(CARGO_OPTS)
 
 .PHONY: release
 release: ## Release binaries

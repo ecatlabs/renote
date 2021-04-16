@@ -51,22 +51,30 @@ impl CommandTrait for CreateNoteCommand {
                     .takes_value(true)
                     .required_unless("config"),
                 Arg::with_name("labels")
-                    .help("Labels to filter")
+                    .help("Labels to filter (and)")
                     .long("labels")
+                    .takes_value(true)
+                    .value_delimiter(",")
+                    .required_unless("config"),
+                Arg::with_name("any_labels")
+                    .value_name("labels")
+                    .help("Any labels to filter (or)")
+                    .long("any-labels")
+                    .value_delimiter(",")
                     .takes_value(true)
                     .required_unless("config"),
                 Arg::with_name("exclude_labels")
-                    .help("Labels to exclude")
                     .value_name("labels")
-                    .value_delimiter(",")
+                    .help("Labels to exclude")
                     .long("exclude-labels")
+                    .value_delimiter(",")
                     .takes_value(true)
                     .required_unless("config"),
                 Arg::with_name("highlight_labels")
-                    .help("Labels to highlight")
                     .value_name("labels")
-                    .value_delimiter(",")
+                    .help("Labels to highlight")
                     .long("highlight-labels")
+                    .value_delimiter(",")
                     .takes_value(true)
                     .required_unless("config"),
             ])
@@ -98,6 +106,17 @@ impl CommandTrait for CreateNoteCommand {
                     matches
                         .values_of("labels")
                         .unwrap()
+                        .collect::<Vec<_>>()
+                        .into_iter()
+                        .map(|it| it.to_string())
+                        .collect(),
+                ),
+                any_labels: Some(
+                    matches
+                        .values_of("any_labels")
+                        .unwrap()
+                        .collect::<Vec<_>>()
+                        .into_iter()
                         .map(|it| it.to_string())
                         .collect(),
                 ),
@@ -105,6 +124,8 @@ impl CommandTrait for CreateNoteCommand {
                     matches
                         .values_of("exclude_labels")
                         .unwrap()
+                        .collect::<Vec<_>>()
+                        .into_iter()
                         .map(|it| it.to_string())
                         .collect(),
                 ),
@@ -112,6 +133,8 @@ impl CommandTrait for CreateNoteCommand {
                     matches
                         .values_of("highlight_labels")
                         .unwrap()
+                        .collect::<Vec<_>>()
+                        .into_iter()
                         .map(|it| it.to_string())
                         .collect(),
                 ),

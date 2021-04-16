@@ -1,35 +1,32 @@
-use anyhow::Result;
+use std::collections::{HashMap, HashSet};
+
 use async_trait::async_trait;
 use hubcaps::issues::Issue;
 use serde::{Deserialize, Serialize};
-use tera::{Context, Tera};
-use tokio_stream::StreamExt;
+use tera::{from_value, to_value, Context, Tera, Value};
 
 use crate::component::issue::{IssueComponent, IssueComponentTrait};
 use crate::config::IssueSearchConfig;
+use crate::result::Result;
 
 const ISSUE_SECTION_TEMPLATE: &'static str = r#"
 {% for section in sections %}
 ## {{ section.title }}
   {% for issue in section.issues -%}
-  - {{ issue.title }} ([{{ issue.id }}]({{ issue.url }})) - {{ issue.assignees }}
-  {% endfor %}
+  - {{ issue.title }} ([{{ issue.id }}]({{ issue.url }})) - {{ assignees_str(value=issue.assignees) }}
+  {% endfor -%}
+{% if not section.issues -%}
+N/A
+{% endif -%}
 {% endfor %}
+## Contributors
+{% for assignee in assignees -%}
+  - @{{ assignee }}
+{% endfor -%}
+{% if not assignees -%}
+N/A
+{% endif -%}
 "#;
-
-#[async_trait]
-pub trait NoteComponentTrait {
-    async fn create_note(&self, config: &IssueSearchConfig) -> Result<String>;
-    fn render_note(&self, config: &IssueSearchConfig, issues: &Vec<Issue>) -> Result<String>;
-}
-
-pub struct NoteComponent;
-
-impl NoteComponent {
-    pub fn new() -> impl NoteComponentTrait {
-        Self
-    }
-}
 
 #[derive(Serialize, Deserialize)]
 struct IssueSection {
@@ -45,6 +42,38 @@ struct IssueSummary {
     assignees: Vec<String>,
 }
 
+#[derive(Serialize, Deserialize)]
+struct Assignee {
+    name: String,
+}
+
+fn assignees_str(args: &HashMap<String, Value>) -> tera::Result<Value> {
+    match args.get("value") {
+        Some(val) => match from_value::<Vec<String>>(val.clone()) {
+            Ok(assignees) => {
+                let assignees: Vec<_> = assignees.iter().map(|it| format!("@{}", it)).collect();
+                Ok(to_value(assignees.join(" ")).unwrap())
+            }
+            Err(_) => Err("".into()),
+        },
+        None => Err("".into()),
+    }
+}
+
+#[async_trait]
+pub(crate) trait NoteComponentTrait {
+    async fn create_note(&self, config: &IssueSearchConfig) -> Result<String>;
+    fn render_note(&self, config: &IssueSearchConfig, issues: &Vec<Issue>) -> Result<String>;
+}
+
+pub(crate) struct NoteComponent;
+
+impl NoteComponent {
+    pub fn new() -> impl NoteComponentTrait {
+        Self
+    }
+}
+
 #[async_trait]
 impl NoteComponentTrait for NoteComponent {
     async fn create_note(&self, config: &IssueSearchConfig) -> Result<String> {
@@ -55,10 +84,6 @@ impl NoteComponentTrait for NoteComponent {
     }
 
     fn render_note(&self, config: &IssueSearchConfig, issues: &Vec<Issue>) -> Result<String> {
-        let mut tera = Tera::default();
-        tera.add_raw_template("issue-sections", ISSUE_SECTION_TEMPLATE);
-
-        let mut context = Context::new();
         let mut issue_sections: Vec<IssueSection> = vec![];
 
         if let Some(highlight_labels) = &config.highlight_labels {
@@ -72,7 +97,7 @@ impl NoteComponentTrait for NoteComponent {
                     .map(|it| IssueSummary {
                         id: it.id,
                         title: it.title.clone(),
-                        url: it.url.clone(),
+                        url: it.html_url.clone(),
                         assignees: it.assignees.iter().map(|it| it.login.clone()).collect(),
                     })
                     .collect();
@@ -84,7 +109,22 @@ impl NoteComponentTrait for NoteComponent {
             }
         }
 
+        let assignees: Vec<_> = issues.iter().flat_map(|it| &it.assignees).collect();
+        let mut assignees: Vec<_> = assignees
+            .into_iter()
+            .map(|it| it.login.clone())
+            .collect::<HashSet<_>>()
+            .into_iter()
+            .collect();
+        assignees.sort();
+
+        let mut tera = Tera::default();
+        tera.add_raw_template("issue-sections", ISSUE_SECTION_TEMPLATE)?;
+        tera.register_function("assignees_str", assignees_str);
+
+        let mut context = Context::new();
         context.insert("sections", &issue_sections);
+        context.insert("assignees", &assignees);
 
         let mut output = tera.render("issue-sections", &context)?;
         output = config.note.as_ref().unwrap().replace("{content}", &output);

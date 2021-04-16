@@ -14,6 +14,8 @@ use crate::cmd::{create_cmd, get_app_matches, CmdGroup};
 mod cmd;
 mod component;
 mod config;
+mod log;
+mod result;
 mod util;
 
 #[tokio::main]
@@ -30,6 +32,7 @@ async fn main() {
         .subcommands(sub_commands)
         .args(&[
             Arg::with_name("token")
+                .value_name("string")
                 .help("GitHub personal access token")
                 .global(true)
                 .long("token")
@@ -37,6 +40,7 @@ async fn main() {
                 .env("GITHUB_TOKEN")
                 .takes_value(true),
             Arg::with_name("owner")
+                .value_name("string")
                 .help("GitHub owner")
                 .global(true)
                 .long("owner")
@@ -44,12 +48,22 @@ async fn main() {
                 .env("GITHUB_OWNER")
                 .takes_value(true),
             Arg::with_name("repo")
+                .value_name("string")
                 .help("GitHub repository")
                 .global(true)
                 .long("repo")
                 .short("r")
                 .env("GITHUB_REPO")
                 .takes_value(true),
+            Arg::with_name("log-level")
+                .value_name("string")
+                .help("Log level")
+                .global(true)
+                .long("log-level")
+                .short("l")
+                .takes_value(true)
+                .default_value("error")
+                .possible_values(&["off", "error", "warn", "info", "debug", "trace"]),
         ]);
 
     let matches = get_app_matches(app);

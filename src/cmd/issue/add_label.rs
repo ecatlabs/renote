@@ -3,9 +3,9 @@ use clap::{App, Arg, ArgMatches, SubCommand};
 
 use crate::cmd::{CmdResult, CommandSetting, CommandTrait};
 
-pub const CMD_ADD_LABEL: &str = "add-label";
+pub(crate) const CMD_ADD_LABEL: &str = "add-label";
 
-pub struct AddLabelCommand;
+pub(crate) struct AddLabelCommand;
 
 impl AddLabelCommand {
     pub fn new() -> Self {

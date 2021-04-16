@@ -1,9 +1,9 @@
 use async_trait::async_trait;
 
-pub use add_label::{AddLabelCommand, CMD_ADD_LABEL};
-pub use assign_milestone::{AssignMilestoneCommand, CMD_ASSIGN_MILESTONE};
-pub use remove_label::{RemoveLabelCommand, CMD_REMOVE_LABEL};
-pub use unassign_milestone::{UnassignMilestoneCommand, CMD_UNASSIGN_MILESTONE};
+pub(crate) use add_label::{AddLabelCommand, CMD_ADD_LABEL};
+pub(crate) use assign_milestone::{AssignMilestoneCommand, CMD_ASSIGN_MILESTONE};
+pub(crate) use remove_label::{RemoveLabelCommand, CMD_REMOVE_LABEL};
+pub(crate) use unassign_milestone::{UnassignMilestoneCommand, CMD_UNASSIGN_MILESTONE};
 
 use crate::cmd::{create_cmd, CommandSetting, CommandTrait};
 
@@ -12,7 +12,7 @@ mod assign_milestone;
 mod remove_label;
 mod unassign_milestone;
 
-pub const CMD_ISSUE: &str = "issue";
+pub(crate) const CMD_ISSUE: &str = "issue";
 
 pub struct IssueCommand {
     setting: CommandSetting,

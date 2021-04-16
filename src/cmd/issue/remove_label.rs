@@ -3,9 +3,9 @@ use clap::{App, Arg, ArgMatches, SubCommand};
 
 use crate::cmd::{CmdResult, CommandSetting, CommandTrait};
 
-pub const CMD_REMOVE_LABEL: &str = "remove-label";
+pub(crate) const CMD_REMOVE_LABEL: &str = "remove-label";
 
-pub struct RemoveLabelCommand;
+pub(crate) struct RemoveLabelCommand;
 
 impl RemoveLabelCommand {
     pub fn new() -> Self {

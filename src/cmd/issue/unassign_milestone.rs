@@ -3,9 +3,9 @@ use clap::{App, Arg, ArgMatches, SubCommand};
 
 use crate::cmd::{CmdResult, CommandSetting, CommandTrait};
 
-pub const CMD_UNASSIGN_MILESTONE: &str = "unassign-milestone";
+pub(crate) const CMD_UNASSIGN_MILESTONE: &str = "unassign-milestone";
 
-pub struct UnassignMilestoneCommand;
+pub(crate) struct UnassignMilestoneCommand;
 
 impl UnassignMilestoneCommand {
     pub fn new() -> Self {
