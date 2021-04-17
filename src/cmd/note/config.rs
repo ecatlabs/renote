@@ -2,35 +2,33 @@ use async_trait::async_trait;
 use clap::{App, ArgMatches, SubCommand};
 
 use crate::cmd::{CmdResult, CommandSetting, CommandTrait};
-use crate::config::{HighlightLabelConfig, IssueSearchConfig};
+use crate::config::{HighlightLabelConfig, NoteConfig};
 
-pub const CMD_GENERATE_TEMPLATE: &str = "template";
+pub const CMD_NODE_CONFIG: &str = "config";
 
-pub struct GenerateTemplateCommand;
+pub struct NodeConfigCommand;
 
-impl GenerateTemplateCommand {
+impl NodeConfigCommand {
     pub fn new() -> Self {
         Self
     }
 }
 
 #[async_trait]
-impl CommandTrait for GenerateTemplateCommand {
+impl CommandTrait for NodeConfigCommand {
     fn setting(&self) -> &CommandSetting {
         unimplemented!()
     }
 
     fn app<'a, 'b>(&self) -> App<'a, 'b> {
-        SubCommand::with_name(CMD_GENERATE_TEMPLATE)
+        SubCommand::with_name(CMD_NODE_CONFIG)
             .about("Generate template")
             .visible_alias("t")
     }
 
     async fn process<'a>(&self, _matches: &ArgMatches<'a>) -> CmdResult {
-        let mut issue = IssueSearchConfig::default();
-        issue.highlight_labels = Some(hashmap! {
-            "example-label".to_string() => HighlightLabelConfig::default()
-        });
+        let mut issue = NoteConfig::default();
+        issue.highlight_labels = Some(vec![HighlightLabelConfig::default()]);
 
         println!("{}", serde_yaml::to_string(&issue)?);
         Ok(())

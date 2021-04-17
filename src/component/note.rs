@@ -1,13 +1,16 @@
 use std::collections::{HashMap, HashSet};
+use std::sync::Arc;
 
 use async_trait::async_trait;
 use hubcaps::issues::Issue;
 use serde::{Deserialize, Serialize};
 use tera::{from_value, to_value, Context, Tera, Value};
 
-use crate::component::issue::{IssueComponent, IssueComponentTrait};
-use crate::config::IssueSearchConfig;
+use crate::component::repo::issue::IssueComponentTrait;
+use crate::component::repo::RepoComponent;
+use crate::config::NoteConfig;
 use crate::result::Result;
+use crate::util::create_github_client;
 
 const ISSUE_SECTION_TEMPLATE: &'static str = r#"
 {% for section in sections %}
@@ -66,61 +69,86 @@ fn assignees_str(args: &HashMap<String, Value>) -> tera::Result<Value> {
 
 #[async_trait]
 pub(crate) trait NoteComponentTrait {
-    async fn create_note(&self, config: &IssueSearchConfig) -> Result<String>;
-    fn render_note(&self, config: &IssueSearchConfig, issues: &Vec<Issue>) -> Result<String>;
+    async fn create_note(&self) -> Result<String>;
+    fn render_note(&self, issues: &Vec<Issue>) -> Result<String>;
 }
 
-pub(crate) struct NoteComponent;
+pub(crate) struct NoteComponent {
+    config: Arc<NoteConfig>,
+}
 
 impl NoteComponent {
-    pub fn new() -> impl NoteComponentTrait {
-        Self
+    pub fn new(config: &Arc<NoteConfig>) -> impl NoteComponentTrait {
+        NoteComponent {
+            config: config.clone(),
+        }
     }
 }
 
 #[async_trait]
 impl NoteComponentTrait for NoteComponent {
-    async fn create_note(&self, config: &IssueSearchConfig) -> Result<String> {
-        let issue_component = IssueComponent::new();
-        let issues = issue_component.search_issues(config).await?;
+    async fn create_note(&self) -> Result<String> {
+        let github = Arc::new(create_github_client(&self.config.token)?);
+        let repo_component = RepoComponent::new(&github, self.config.clone());
 
-        self.render_note(config, &issues)
+        let issues = repo_component.list_issues().await?;
+        self.render_note(&issues)
     }
 
-    fn render_note(&self, config: &IssueSearchConfig, issues: &Vec<Issue>) -> Result<String> {
-        let mut issue_sections: Vec<IssueSection> = vec![];
+    fn render_note(&self, issues: &Vec<Issue>) -> Result<String> {
+        // let mut issue_sections: Vec<IssueSection> = vec![];
+        let mut issue_sections: HashMap<String, IssueSection> = hashmap! {};
+        let highlight_labels = self.config.highlight_labels.clone().unwrap_or_default();
 
-        if let Some(highlight_labels) = &config.highlight_labels {
-            for (label, highlight_label_config) in highlight_labels {
-                let issues: Vec<_> = issues
-                    .iter()
-                    .filter(|issue| {
-                        let issue_labels: Vec<_> = issue.labels.iter().map(|it| &it.name).collect();
-                        issue_labels.contains(&label)
-                    })
-                    .map(|it| IssueSummary {
-                        id: it.number,
-                        title: it.title.clone(),
-                        url: it.html_url.clone(),
-                        assignees: it.assignees.iter().map(|it| it.login.clone()).collect(),
-                    })
-                    .collect();
+        'outer: for issue in issues.iter() {
+            let issue_labels: Vec<_> = issue.labels.iter().map(|it| &it.name).collect();
 
-                issue_sections.push(IssueSection {
-                    index: highlight_label_config.index.unwrap_or(0),
-                    title: highlight_label_config
-                        .title
-                        .clone()
-                        .unwrap_or("".to_string()),
-                    description: highlight_label_config
-                        .description
-                        .clone()
-                        .unwrap_or("".to_string()),
-                    issues,
-                });
+            let issue_summary = IssueSummary {
+                id: issue.number,
+                title: issue.title.clone(),
+                url: issue.html_url.clone(),
+                assignees: issue.assignees.iter().map(|it| it.login.clone()).collect(),
+            };
+
+            for (index, label_config) in highlight_labels.iter().enumerate() {
+                if issue_labels.contains(&&label_config.label) {
+                    if let Some(s) = issue_sections.get_mut(&label_config.label) {
+                        s.issues.push(issue_summary);
+                    } else {
+                        issue_sections.insert(
+                            label_config.label.clone(),
+                            IssueSection {
+                                index: index as i8,
+                                title: label_config.title.clone().unwrap_or("".to_string()),
+                                description: label_config
+                                    .description
+                                    .clone()
+                                    .unwrap_or("".to_string()),
+                                issues: vec![issue_summary],
+                            },
+                        );
+                    }
+
+                    continue 'outer;
+                }
+            }
+
+            if let Some(s) = issue_sections.get_mut("misc") {
+                s.issues.push(issue_summary);
+            } else {
+                issue_sections.insert(
+                    "misc".to_string(),
+                    IssueSection {
+                        index: 100,
+                        title: "Misc".to_string(),
+                        description: "".to_string(),
+                        issues: vec![issue_summary],
+                    },
+                );
             }
         }
 
+        let mut issue_sections: Vec<_> = issue_sections.values().collect();
         issue_sections.sort_by(|a, b| a.index.partial_cmp(&b.index).unwrap());
 
         let assignees: Vec<_> = issues.iter().flat_map(|it| &it.assignees).collect();
@@ -131,7 +159,7 @@ impl NoteComponentTrait for NoteComponent {
             .into_iter()
             .collect();
 
-        if let Some(mut contributors) = config.extra_contributors.clone() {
+        if let Some(mut contributors) = self.config.extra_contributors.clone() {
             assignees.append(&mut contributors);
         }
 
@@ -146,7 +174,12 @@ impl NoteComponentTrait for NoteComponent {
         context.insert("assignees", &assignees);
 
         let mut output = tera.render("issue-sections", &context)?;
-        output = config.note.as_ref().unwrap().replace("{content}", &output);
+        output = self
+            .config
+            .note
+            .as_ref()
+            .unwrap()
+            .replace("{content}", &output);
 
         Ok(output)
     }

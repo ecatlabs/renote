@@ -1,7 +1,7 @@
 owner: longhorn
 repo: longhorn
 token: ""
-state: closed
+state: all
 note: >-
   ## Release Note
 
@@ -19,13 +19,11 @@ exclude_labels:
   - kind/task
   - wontfix
 highlight_labels:
-  kind/bug:
-    index: 2
-    title: Bugs
-  kind/enhancement:
-    index: 1
-    title: Enhancements
-  highlight:
-    index: 0
+  - label: highlight
     title: Highlights
     description: ""
+  - label: kind/enhancement
+    title: Enhancements
+  - label: kind/bug
+    title: Bugs
+

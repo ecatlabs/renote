@@ -6,7 +6,8 @@ use clap::{App, Arg, ArgMatches, SubCommand};
 
 use crate::cmd::{CmdResult, CommandSetting, CommandTrait};
 use crate::component::note::{NoteComponent, NoteComponentTrait};
-use crate::config::IssueSearchConfig;
+use crate::config::NoteConfig;
+use std::sync::Arc;
 
 pub const CMD_CREATE_NOTE: &str = "create";
 
@@ -39,22 +40,22 @@ impl CommandTrait for CreateNoteCommand {
         let config_path = matches.value_of("config").unwrap();
         let file = File::open(Path::new(config_path))
             .expect(format!("expect {} found", config_path).as_str());
-        let mut search_config: IssueSearchConfig =
+        let mut note_config: NoteConfig =
             serde_yaml::from_reader(file).expect("expect node config file");
 
         // override by the global settings
         if matches.is_present("token") {
-            search_config.token = matches.value_of("token").unwrap().to_string();
+            note_config.token = matches.value_of("token").unwrap().to_string();
         }
         if matches.is_present("owner") {
-            search_config.owner = matches.value_of("owner").unwrap().to_string();
+            note_config.owner = matches.value_of("owner").unwrap().to_string();
         }
         if matches.is_present("repo") {
-            search_config.repo = matches.value_of("repo").unwrap().to_string();
+            note_config.repo = matches.value_of("repo").unwrap().to_string();
         }
 
-        let note_component = NoteComponent::new();
-        println!("{}", note_component.create_note(&search_config).await?);
+        let note_component = NoteComponent::new(&Arc::new(note_config));
+        println!("{}", note_component.create_note().await?);
 
         Ok(())
     }

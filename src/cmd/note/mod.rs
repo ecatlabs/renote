@@ -2,11 +2,11 @@ use async_trait::async_trait;
 
 pub use create::*;
 
-use crate::cmd::note::template::{GenerateTemplateCommand, CMD_GENERATE_TEMPLATE};
+use crate::cmd::note::config::{NodeConfigCommand, CMD_NODE_CONFIG};
 use crate::cmd::{create_cmd, CommandSetting, CommandTrait};
 
+mod config;
 mod create;
-mod template;
 
 pub const CMD_NOTE: &str = "note";
 
@@ -22,7 +22,7 @@ impl NoteCommand {
                 about: "Note commands",
                 commands: hashmap! {
                     CMD_CREATE_NOTE => create_cmd(Box::new(CreateNoteCommand::new())),
-                    CMD_GENERATE_TEMPLATE => create_cmd(Box::new(GenerateTemplateCommand::new())),
+                    CMD_NODE_CONFIG => create_cmd(Box::new(NodeConfigCommand::new())),
                 },
             },
         }
