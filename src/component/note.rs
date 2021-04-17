@@ -8,12 +8,11 @@ use tera::{from_value, to_value, Context, Tera, Value};
 use crate::component::issue::{IssueComponent, IssueComponentTrait};
 use crate::config::IssueSearchConfig;
 use crate::result::Result;
-use regex::Regex;
 
 const ISSUE_SECTION_TEMPLATE: &'static str = r#"
 {% for section in sections %}
 ## {{ section.title }}
-
+  {{ section.description }}
   {% for issue in section.issues -%}
   - {{ issue.title }} ([{{ issue.id }}]({{ issue.url }})) - {{ assignees_str(value=issue.assignees) }}
   {% endfor -%}
@@ -35,6 +34,7 @@ N/A
 struct IssueSection {
     index: i8,
     title: String,
+    description: String,
     issues: Vec<IssueSummary>,
 }
 
@@ -91,9 +91,7 @@ impl NoteComponentTrait for NoteComponent {
         let mut issue_sections: Vec<IssueSection> = vec![];
 
         if let Some(highlight_labels) = &config.highlight_labels {
-            let regex = Regex::new(r"(\S+)\s+\(index=(\d+)\)")?;
-
-            for (label, section_title) in highlight_labels {
+            for (label, highlight_label_config) in highlight_labels {
                 let issues: Vec<_> = issues
                     .iter()
                     .filter(|issue| {
@@ -108,19 +106,16 @@ impl NoteComponentTrait for NoteComponent {
                     })
                     .collect();
 
-                let (section_title, section_index) = if let Some(c) = regex.captures(&section_title)
-                {
-                    (
-                        c.get(1).unwrap().as_str().trim().to_string(),
-                        c.get(2).unwrap().as_str().parse::<i8>()?,
-                    )
-                } else {
-                    (section_title.clone(), -1)
-                };
-
                 issue_sections.push(IssueSection {
-                    index: section_index,
-                    title: section_title,
+                    index: highlight_label_config.index.unwrap_or(0),
+                    title: highlight_label_config
+                        .title
+                        .clone()
+                        .unwrap_or("".to_string()),
+                    description: highlight_label_config
+                        .description
+                        .clone()
+                        .unwrap_or("".to_string()),
                     issues,
                 });
             }
@@ -135,6 +130,11 @@ impl NoteComponentTrait for NoteComponent {
             .collect::<HashSet<_>>()
             .into_iter()
             .collect();
+
+        if let Some(mut contributors) = config.extra_contributors.clone() {
+            assignees.append(&mut contributors);
+        }
+
         assignees.sort();
 
         let mut tera = Tera::default();

@@ -4,11 +4,14 @@ token: ""
 state: closed
 note: >-
   ## Release Note
+
   ## Upgrade
 
   {content}
 milestone: v1.1.1
 show_contributor: true
+extra_contributors:
+  - innobead
 any_labels: [ ]
 labels: [ ]
 exclude_labels:
@@ -16,6 +19,13 @@ exclude_labels:
   - kind/task
   - wontfix
 highlight_labels:
-  kind/bug: Bugs (index=2)
-  kind/enhancement: Enhancements (index=1)
-  highlight: Highlights (index=0)
+  kind/bug:
+    index: 2
+    title: Bugs
+  kind/enhancement:
+    index: 1
+    title: Enhancements
+  highlight:
+    index: 0
+    title: Highlights
+    description: ""

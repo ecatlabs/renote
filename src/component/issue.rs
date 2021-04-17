@@ -8,6 +8,7 @@ use crate::component::to_issue_state;
 use crate::config::IssueSearchConfig;
 use crate::result::Result;
 use crate::util::create_github_client;
+use log::error;
 
 pub(crate) struct IssueComponent;
 
@@ -68,6 +69,11 @@ impl IssueComponentTrait for IssueComponent {
             .issues()
             .iter(&search_options)
             .filter_map(|it| {
+                if let Err(err) = it {
+                    error!("Failed to parse the issue: {}", err);
+                    return None;
+                }
+
                 let issue = it.unwrap_or(Issue {
                     id: 0,
                     url: "".to_string(),
@@ -180,10 +186,15 @@ impl IssueComponentTrait for IssueComponent {
             .search()
             .issues()
             .iter(search_query, &search_options)
-            .map(|it| {
+            .filter_map(|it| {
+                if let Err(err) = it {
+                    error!("Failed to parse the issue: {}", err);
+                    return None;
+                }
+
                 let issue: Issue =
                     serde_yaml::from_str(&serde_yaml::to_string(&it.unwrap()).unwrap()).unwrap();
-                issue
+                Some(issue)
             })
             .collect()
             .await;
