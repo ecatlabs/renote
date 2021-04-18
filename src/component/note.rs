@@ -11,6 +11,7 @@ use crate::component::repo::RepoComponent;
 use crate::config::NoteConfig;
 use crate::result::Result;
 use crate::util::create_github_client;
+use std::fs;
 
 const ISSUE_SECTION_TEMPLATE: &'static str = r#"
 {% for section in sections %}
@@ -174,12 +175,17 @@ impl NoteComponentTrait for NoteComponent {
         context.insert("assignees", &assignees);
 
         let mut output = tera.render("issue-sections", &context)?;
-        output = self
-            .config
-            .note
-            .as_ref()
-            .unwrap()
-            .replace("{content}", &output);
+        if let Some(mut note_template) = self.config.note.clone() {
+            if let Ok(f) = fs::metadata(&note_template) {
+                if f.is_file() {
+                    note_template = fs::read_to_string(&note_template)?;
+                }
+            }
+
+            if !note_template.is_empty() {
+                output = note_template.replace("{content}", &output);
+            }
+        }
 
         Ok(output)
     }

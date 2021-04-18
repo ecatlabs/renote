@@ -1,11 +1,12 @@
 use async_trait::async_trait;
 use hubcaps::issues::{Issue, IssueListOptions, Sort, State};
-use hubcaps::search::{IssuesSort, SearchIssuesOptions};
+use hubcaps::search::{IssuesItem, IssuesSort, SearchIssuesOptions};
 use log::error;
 use tokio_stream::StreamExt;
 
 use crate::component::repo::release::ReleaseComponentTrait;
 use crate::component::repo::RepoComponent;
+use crate::config::IssueSort;
 use crate::result::Result;
 
 fn to_issue_state(state: &str) -> State {
@@ -16,11 +17,17 @@ fn to_issue_state(state: &str) -> State {
     }
 }
 
+fn to_issue(issue_item: &IssuesItem) -> Result<Issue> {
+    let output = serde_yaml::to_string(issue_item)?;
+    Ok(serde_yaml::from_str::<Issue>(&output)?)
+}
+
 #[async_trait]
 pub(crate) trait IssueComponentTrait {
     async fn list_issues(&self) -> Result<Vec<Issue>>;
     async fn search_issues_by_labels(&self, labels: &Vec<String>) -> Result<Vec<Issue>>;
     async fn search_issues_by_query(&self, label: &String) -> Result<Vec<Issue>>;
+    fn filter_issue(&self, issue: &Issue) -> bool;
 }
 
 #[async_trait]
@@ -47,12 +54,16 @@ impl IssueComponentTrait for RepoComponent {
             .repo(self.config.owner.clone(), self.config.repo.clone());
 
         let latest_release = self.get_latest_release().await?;
-        let search_options = IssueListOptions::builder()
+        let mut search_options_builder = IssueListOptions::builder();
+        search_options_builder
             .labels(labels.clone())
             .state(to_issue_state(&self.config.state))
             .sort(Sort::Created)
-            .since(&latest_release.created_at)
-            .build();
+            .since(&latest_release.created_at);
+        if let Some(IssueSort::Asc) = &self.config.sort {
+            search_options_builder.asc();
+        }
+        let search_options = search_options_builder.build();
 
         let issues: Vec<_> = repo
             .issues()
@@ -64,28 +75,11 @@ impl IssueComponentTrait for RepoComponent {
                 }
                 let issue = it.unwrap();
 
-                // filter milestone
-                if let Some(milestone) = &issue.milestone {
-                    if let Some(expected_milestone) = &self.config.milestone {
-                        if milestone.title != *expected_milestone {
-                            return None;
-                        }
-                    }
+                if self.filter_issue(&issue) {
+                    Some(issue)
                 } else {
-                    return None;
+                    None
                 }
-
-                // filter exclude_labels
-                if let Some(labels) = &self.config.exclude_labels {
-                    let issue_labels: Vec<_> = issue.labels.iter().map(|it| &it.name).collect();
-                    for label in labels {
-                        if issue_labels.contains(&label) {
-                            return None;
-                        }
-                    }
-                }
-
-                Some(issue)
             })
             .collect()
             .await;
@@ -127,12 +121,56 @@ impl IssueComponentTrait for RepoComponent {
                     return None;
                 }
 
-                let issue: Issue =
-                    serde_yaml::from_str(&serde_yaml::to_string(&it.unwrap()).unwrap()).unwrap();
-                Some(issue)
+                match to_issue(&it.unwrap()) {
+                    Ok(issue) => {
+                        if self.filter_issue(&issue) {
+                            Some(issue)
+                        } else {
+                            None
+                        }
+                    }
+                    Err(err) => {
+                        error!("Failed to convert the issue item to an issue: {}", err);
+                        None
+                    }
+                }
             })
             .collect()
             .await;
         Ok(issues)
+    }
+
+    fn filter_issue(&self, issue: &Issue) -> bool {
+        let exclude_issue_numbers = self.config.exclude_issues.clone().unwrap_or(vec![]);
+
+        // filter excluded issues
+        if !exclude_issue_numbers.is_empty() {
+            if exclude_issue_numbers.contains(&issue.number) {
+                return false;
+            }
+        }
+
+        // filter milestone
+        if let Some(milestone) = &issue.milestone {
+            if let Some(expected_milestone) = &self.config.milestone {
+                if milestone.title != *expected_milestone {
+                    return false;
+                }
+            }
+        } else {
+            return false;
+        }
+
+        // filter exclude_labels
+        if let Some(labels) = &self.config.exclude_labels {
+            let issue_labels: Vec<_> = issue.labels.iter().map(|it| &it.name).collect();
+            for label in labels {
+                if issue_labels.contains(&label) {
+                    return false;
+                }
+            }
+        }
+
+        true
     }
 }

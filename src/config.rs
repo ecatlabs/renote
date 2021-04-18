@@ -8,12 +8,22 @@ pub(crate) struct NoteConfig {
     pub state: String,
     pub note: Option<String>,
     pub milestone: Option<String>,
+    pub show_contributor: bool,
+    pub extra_contributors: Option<Vec<String>>,
+    pub exclude_issues: Option<Vec<u64>>,
+    pub sort: Option<IssueSort>,
     pub labels: Option<Vec<String>>,
     pub any_labels: Option<Vec<String>>,
     pub exclude_labels: Option<Vec<String>>,
     pub highlight_labels: Option<Vec<HighlightLabelConfig>>,
-    pub show_contributor: bool,
-    pub extra_contributors: Option<Vec<String>>,
+}
+
+#[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]
+pub(crate) enum IssueSort {
+    #[serde(rename = "asc")]
+    Asc,
+    #[serde(rename = "desc")]
+    Desc,
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Default, Clone)]

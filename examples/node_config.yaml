@@ -1,7 +1,7 @@
 owner: longhorn
 repo: longhorn
 token: ""
-state: all
+state: closed
 note: >-
   ## Release Note
 
@@ -12,8 +12,12 @@ milestone: v1.1.1
 show_contributor: true
 extra_contributors:
   - innobead
-any_labels: [ ]
+exclude_issues:
+  - 304
+  - 508
+sort: asc
 labels: [ ]
+any_labels: [ ]
 exclude_labels:
   - area/test
   - kind/task
@@ -26,4 +30,3 @@ highlight_labels:
     title: Enhancements
   - label: kind/bug
     title: Bugs
-
