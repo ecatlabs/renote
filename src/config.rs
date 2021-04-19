@@ -1,3 +1,4 @@
+use clap::ArgMatches;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Default, Clone)]
@@ -40,4 +41,15 @@ pub(crate) struct ReleaseConfig {
     pub pre_release: bool,
     pub artifacts: Option<Vec<String>>,
     pub note_config: NoteConfig,
+}
+
+impl NoteConfig {
+    pub fn new(args: &ArgMatches) -> Self {
+        let mut config = NoteConfig::default();
+        config.owner = args.value_of("owner").unwrap().to_string();
+        config.repo = args.value_of("repo").unwrap().to_string();
+        config.token = args.value_of("token").unwrap().to_string();
+
+        config
+    }
 }

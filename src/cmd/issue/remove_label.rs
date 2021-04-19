@@ -32,6 +32,12 @@ impl CommandTrait for RemoveLabelCommand {
                     .long("query")
                     .value_delimiter(" ")
                     .takes_value(true),
+                Arg::with_name("labels")
+                    .help("Labels to remove")
+                    .long("labels")
+                    .value_delimiter(" ")
+                    .required(true)
+                    .takes_value(true),
             ])
     }
 

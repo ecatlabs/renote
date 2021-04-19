@@ -47,12 +47,9 @@ impl CommandTrait for SearchIssueCommand {
     async fn process<'a>(&self, matches: &ArgMatches<'a>) -> CmdResult {
         check_github_args(&matches)?;
 
-        let mut config = NoteConfig::default();
-        config.owner = matches.value_of("owner").unwrap().to_string();
-        config.repo = matches.value_of("repo").unwrap().to_string();
-        config.token = matches.value_of("token").unwrap().to_string();
-
+        let config = NoteConfig::new(matches);
         let repo_component = RepoComponent::new(None, Arc::new(config));
+
         let issues = progress!(
             "Searching issues",
             repo_component.search_issues_by_query(matches.value_of("query").unwrap_or_default()).await?;

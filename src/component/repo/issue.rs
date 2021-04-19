@@ -1,5 +1,7 @@
+use anyhow::anyhow;
 use async_trait::async_trait;
-use hubcaps::issues::{Issue, IssueListOptions, Sort, State};
+use hubcaps::issues::{Issue, IssueListOptions, IssueOptions, Sort, State};
+use hubcaps::milestone::{Milestone, MilestoneListOptions};
 use hubcaps::search::{IssuesItem, IssuesSort, SearchIssuesOptions};
 use log::error;
 use tokio_stream::StreamExt;
@@ -27,6 +29,8 @@ pub(crate) trait IssueComponentTrait {
     async fn list_issues(&self) -> Result<Vec<Issue>>;
     async fn search_issues_by_labels(&self, labels: &Vec<String>) -> Result<Vec<Issue>>;
     async fn search_issues_by_query(&self, query: &str) -> Result<Vec<Issue>>;
+    async fn update_issues(&self, issues: &Vec<IssueOptions>) -> Result<()>;
+    async fn get_milestone(&self, milestone: &str) -> Result<Milestone>;
     fn filter_issue(&self, issue: &Issue) -> bool;
 }
 
@@ -142,6 +146,36 @@ impl IssueComponentTrait for RepoComponent {
             .collect()
             .await;
         Ok(issues)
+    }
+
+    async fn update_issues(&self, issues: &Vec<IssueOptions>) -> Result<()> {
+        let repo = self
+            .github
+            .repo(self.config.owner.clone(), self.config.repo.clone());
+
+        for issue in issues {
+            repo.issues().update(issue).await?;
+        }
+
+        Ok(())
+    }
+
+    async fn get_milestone(&self, milestone: &str) -> Result<Milestone> {
+        let repo = self
+            .github
+            .repo(self.config.owner.clone(), self.config.repo.clone());
+
+        let list_options = MilestoneListOptions::builder().build();
+        match repo
+            .milestones()
+            .list(&list_options)
+            .await?
+            .into_iter()
+            .find(|it| it.title == milestone)
+        {
+            Some(m) => Ok(m),
+            None => Err(anyhow!("milestone {} not found", milestone)),
+        }
     }
 
     fn filter_issue(&self, issue: &Issue) -> bool {

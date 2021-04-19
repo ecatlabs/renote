@@ -574,7 +574,7 @@ checksum = "494b4d60369511e7dea41cf646832512a94e542f68bb9c49e54518e0f468eb47"
 [[package]]
 name = "hubcaps"
 version = "0.6.2"
-source = "git+https://github.com/innobead/hubcaps#023569de1642142c9da514fde639e7a7636179b1"
+source = "git+https://github.com/innobead/hubcaps#931adbeded7d5684ee27ada0e0f3837cc9d4a352"
 dependencies = [
  "base64 0.13.0",
  "data-encoding",
