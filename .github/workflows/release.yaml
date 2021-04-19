@@ -50,8 +50,8 @@ jobs:
 
   release-macos:
     name: Release for MacOS
-    needs: release-linux-x86_64
     runs-on: macos-latest
+    needs: [ ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
