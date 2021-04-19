@@ -1,0 +1,82 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release-linux-x86_64:
+    name: Release for linux x86_64
+    runs-on: ubuntu-latest
+    needs: [ ]
+    steps:
+      - name: Checkout code
+        id: checkout-code
+        uses: actions/checkout@v2
+
+      - name: Setup build environment
+        run: make setup-dev
+
+      - name: Build all artifacts
+        run: make release
+
+      - name: Create changelog
+        id: changelog
+        uses: innobead/github-release-notes-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create release and upload artifacts
+        id: upload-release-asset
+        run: |
+          set -x
+
+          assets=()
+
+          while IFS= read -r -d '' f; do
+            if [[ -f "$f" ]]; then
+              assets+=("-a" "./$f")
+            fi
+          done < <(find ./.target -print0)
+
+          tag_name="${GITHUB_REF##*/}"
+          hub release edit -d "${assets[@]}" -m "" "$tag_name"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CHANGELOG: ${{ steps.changelog.outputs.changelog }}
+
+  release-macos:
+    name: Release for MacOS
+    needs: release-linux-x86_64
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup build environment
+        run: make setup-dev
+
+      - name: Build all artifacts
+        run: source ~/.bashrc && make release
+
+      - name: Create release and upload artifacts
+        id: upload-release-asset
+        run: |
+          set -x
+
+          assets=()
+
+          while IFS= read -r -d '' f; do
+            if [[ -f "$f" ]]; then
+              assets+=("-a" "./$f")
+            fi
+          done < <(find ./.target -print0)
+
+          tag_name="${GITHUB_REF##*/}"
+          tag_name="$(hub release -d | head -n 1 | tr -d '\n')"
+          hub release edit -d "${assets[@]}" -m "" "$tag_name"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
