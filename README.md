@@ -13,6 +13,14 @@
 
 The GitHub credential is necessary, please refer to [how to create a personal access token](https://github.com/settings/tokens).
 
+## Installation
+
+You can use [huber](https://github.com/innobead/huber) to install renote or download the released binary directly.
+
+```console
+huber install renote
+```
+
 ## Tutorials
 
 ### Create a release note config
