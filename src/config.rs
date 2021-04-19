@@ -34,15 +34,6 @@ pub(crate) struct HighlightLabelConfig {
     pub description: Option<String>,
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize, Default, Clone)]
-pub(crate) struct ReleaseConfig {
-    pub name: String,
-    pub draft: bool,
-    pub pre_release: bool,
-    pub artifacts: Option<Vec<String>>,
-    pub note_config: NoteConfig,
-}
-
 impl NoteConfig {
     pub fn new(args: &ArgMatches) -> Self {
         let mut config = NoteConfig::default();

@@ -1,13 +1,12 @@
+---
 owner: longhorn
 repo: longhorn
 token: ""
 state: closed
-note: >- # or file path
+note: >-          # string or file path
   ## Release Note
-
-  ## Upgrade
-
   {content}
+
 milestone: v1.1.1
 show_contributor: true
 extra_contributors:
@@ -16,17 +15,20 @@ exclude_issues:
   - 304
   - 508
 sort: asc
-labels: [ ]
-any_labels: [ ]
+labels: []
+any_labels: []
 exclude_labels:
   - area/test
+  - area/test-infra
   - kind/task
   - wontfix
 highlight_labels:
   - label: highlight
     title: Highlights
-    description: ""
+    description: ~
   - label: kind/enhancement
     title: Enhancements
+    description: ~
   - label: kind/bug
     title: Bugs
+    description: ~

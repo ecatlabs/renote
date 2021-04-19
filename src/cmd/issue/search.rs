@@ -64,7 +64,7 @@ impl CommandTrait for SearchIssueCommand {
         output!(output_format, .display(
             stdout(),
             &issues,
-            Some(vec!["url", "title"]),
+            Some(vec!["html_url", "title"]),
             None,
         ))
     }
