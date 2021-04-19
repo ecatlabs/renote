@@ -22,14 +22,4 @@ function install_rust_dependencies() {
   fi
 }
 
-os=$(uname)
-case $os in
-"Linux")
-  install_linux_dependencies
-  ;;
-"Darwin")
-  install_macos_dependencies
-  ;;
-esac
-
 install_rust_dependencies
