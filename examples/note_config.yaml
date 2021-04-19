@@ -2,8 +2,8 @@
 owner: longhorn
 repo: longhorn
 token: ""
-state: closed
-note: >-          # string or file path
+state: closed        # open, closed, all
+note: >-             # string or file path
   ## Release Note
   {content}
 
@@ -14,7 +14,7 @@ extra_contributors:
 exclude_issues:
   - 304
   - 508
-sort: asc
+sort: asc            # asc, desc
 labels: []
 any_labels: []
 exclude_labels:

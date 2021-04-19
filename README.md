@@ -60,6 +60,36 @@ highlight_labels:
     description: ~
 ```
 
+Example
+
+```yaml
+---
+owner: longhorn
+repo: longhorn
+token: ""
+state: closed        # open, closed, all
+note: >-             # string or file path
+  ## Release Note
+  {content}
+
+milestone: v1.1.1
+show_contributor: true
+extra_contributors:
+  - innobead
+exclude_issues:
+  - 304
+sort: asc            # asc, desc
+labels: []
+any_labels: []
+exclude_labels:
+  - wontfix
+highlight_labels:
+  - label: highlight
+    title: Highlights
+    description: ~
+
+```
+
 ### Create a release note
 
 Based on the note config file, you can search issues matching the release scope like milestone, issue filters, etc. Also, the note can be customized by the Markdown content or file where `{content}`
