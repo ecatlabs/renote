@@ -18,7 +18,18 @@ The GitHub credential is necessary, please refer to [how to create a personal ac
 You can use [huber](https://github.com/innobead/huber) to install renote or download the released binary directly.
 
 ```console
-huber install renote
+❯ huber install renote
+Updating managed repos
+Updating unmanaged repos
+Installing renote
+Downloading package artifacts from github "https://github.com/ecatlabs/renote"
+Setting renote (version: v0.1.0, source: github) as the current package
+Installed executables:
+ - /home/davidko/.huber/bin/renote
+renote (version: v0.1.0, source: github) installed
+
+❯ renote -V
+renote v0.1.0 Commit: 261b21e-20210419081458
 ```
 
 ## Tutorials
