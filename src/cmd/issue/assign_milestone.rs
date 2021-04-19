@@ -1,7 +1,8 @@
 use async_trait::async_trait;
 use clap::{App, Arg, ArgMatches, SubCommand};
 
-use crate::cmd::{CmdResult, CommandSetting, CommandTrait};
+use crate::cmd::{CommandSetting, CommandTrait};
+use crate::result::CmdResult;
 
 pub(crate) const CMD_ASSIGN_MILESTONE: &str = "assign-milestone";
 

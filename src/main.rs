@@ -2,12 +2,15 @@
 
 #[macro_use]
 extern crate maplit;
+#[macro_use]
+extern crate libcli_rs;
 
 use clap::{App, Arg};
 
 use crate::cmd::issue::*;
 use crate::cmd::note::*;
 use crate::cmd::{create_cmd, get_app_matches, CmdGroup};
+use std::process::exit;
 
 mod cmd;
 mod component;
@@ -62,15 +65,27 @@ async fn main() {
                 .takes_value(true)
                 .default_value("error")
                 .possible_values(&["off", "error", "warn", "info", "debug", "trace"]),
+            Arg::with_name("format")
+                .value_name("format")
+                .help("Output format")
+                .global(true)
+                .long("format")
+                .short("f")
+                .takes_value(true)
+                .default_value("console")
+                .possible_values(&["console", "json", "yaml"]),
         ]);
 
     let matches = get_app_matches(app);
     if let (command_name, Some(sub_matches)) = matches.subcommand() {
-        commands
+        if let Err(err) = commands
             .get(command_name)
             .unwrap()
             .process(sub_matches)
             .await
-            .expect("expect command");
+        {
+            eprintln!("Error: {:?}", err);
+            exit(1);
+        }
     }
 }

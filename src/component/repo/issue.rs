@@ -26,7 +26,7 @@ fn to_issue(issue_item: &IssuesItem) -> Result<Issue> {
 pub(crate) trait IssueComponentTrait {
     async fn list_issues(&self) -> Result<Vec<Issue>>;
     async fn search_issues_by_labels(&self, labels: &Vec<String>) -> Result<Vec<Issue>>;
-    async fn search_issues_by_query(&self, label: &String) -> Result<Vec<Issue>>;
+    async fn search_issues_by_query(&self, query: &str) -> Result<Vec<Issue>>;
     fn filter_issue(&self, issue: &Issue) -> bool;
 }
 
@@ -70,7 +70,7 @@ impl IssueComponentTrait for RepoComponent {
             .iter(&search_options)
             .filter_map(|it| {
                 if let Err(err) = it {
-                    error!("Failed to parse the issue: {:?}", err);
+                    error!("failed to parse the issue: {:?}", err);
                     return None;
                 }
                 let issue = it.unwrap();
@@ -87,24 +87,28 @@ impl IssueComponentTrait for RepoComponent {
         Ok(issues)
     }
 
-    async fn search_issues_by_query(&self, _label: &String) -> Result<Vec<Issue>> {
+    async fn search_issues_by_query(&self, query: &str) -> Result<Vec<Issue>> {
         let search_options = SearchIssuesOptions::builder()
             .sort(IssuesSort::Created)
             .build();
 
-        let mut search_query: Vec<String> = vec![];
+        let mut search_query: Vec<String> = query.split(" ").map(|it| it.to_string()).collect();
+        search_query.push(format!("repo:{}/{}", self.config.owner, self.config.repo));
 
         if let Some(milestone) = &self.config.milestone {
             search_query.push(format!("milestone:{}", milestone));
         }
-        search_query.push(format!("is:{}", &self.config.state));
+
+        if !self.config.state.is_empty() {
+            search_query.push(format!("is:{}", &self.config.state));
+        }
 
         let labels = self.config.labels.clone().unwrap_or(vec![]);
         for label in &labels {
             search_query.push(format!("label:{}", label))
         }
 
-        for label in self.config.exclude_labels.as_ref().unwrap() {
+        for label in self.config.exclude_labels.clone().unwrap_or(vec![]) {
             search_query.push(format!("-label:{}", label));
         }
 
@@ -117,7 +121,7 @@ impl IssueComponentTrait for RepoComponent {
             .iter(search_query, &search_options)
             .filter_map(|it| {
                 if let Err(err) = it {
-                    error!("Failed to parse the issue: {}", err);
+                    error!("failed to parse the issue: {}", err);
                     return None;
                 }
 
@@ -130,7 +134,7 @@ impl IssueComponentTrait for RepoComponent {
                         }
                     }
                     Err(err) => {
-                        error!("Failed to convert the issue item to an issue: {}", err);
+                        error!("failed to convert the issue item to an issue: {}", err);
                         None
                     }
                 }

@@ -4,9 +4,10 @@ use std::path::Path;
 use async_trait::async_trait;
 use clap::{App, Arg, ArgMatches, SubCommand};
 
-use crate::cmd::{CmdResult, CommandSetting, CommandTrait};
+use crate::cmd::{CommandSetting, CommandTrait};
 use crate::component::note::{NoteComponent, NoteComponentTrait};
 use crate::config::NoteConfig;
+use crate::result::CmdResult;
 use std::sync::Arc;
 
 pub const CMD_CREATE_NOTE: &str = "create";
@@ -54,7 +55,7 @@ impl CommandTrait for CreateNoteCommand {
             note_config.repo = matches.value_of("repo").unwrap().to_string();
         }
 
-        let note_component = NoteComponent::new(&Arc::new(note_config));
+        let note_component = NoteComponent::new(Arc::new(note_config));
         println!("{}", note_component.create_note().await?);
 
         Ok(())

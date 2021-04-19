@@ -1,8 +1,9 @@
 use async_trait::async_trait;
 use clap::{App, ArgMatches, SubCommand};
 
-use crate::cmd::{CmdResult, CommandSetting, CommandTrait};
+use crate::cmd::{CommandSetting, CommandTrait};
 use crate::config::{HighlightLabelConfig, NoteConfig};
+use crate::result::CmdResult;
 
 pub const CMD_NODE_CONFIG: &str = "config";
 

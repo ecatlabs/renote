@@ -3,3 +3,5 @@
 - Create a release note of issues from the latest release by advanced search options 
 - Add or remove labels of issues by advanced search options
 - Add or remove issues to/from a milestone by advanced search options 
+- Search issues by advance search options
+

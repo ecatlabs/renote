@@ -5,9 +5,10 @@ use hubcaps::Github;
 use crate::component::repo::issue::IssueComponentTrait;
 use crate::component::repo::release::ReleaseComponentTrait;
 use crate::config::NoteConfig;
+use crate::util::create_github_client;
 
 pub(crate) mod issue;
-mod release;
+pub(crate) mod release;
 
 pub(crate) struct RepoComponent {
     github: Arc<Github>,
@@ -16,12 +17,15 @@ pub(crate) struct RepoComponent {
 
 impl RepoComponent {
     pub fn new(
-        github: &Arc<Github>,
+        github: Option<Arc<Github>>,
         config: Arc<NoteConfig>,
     ) -> impl IssueComponentTrait + ReleaseComponentTrait {
-        RepoComponent {
-            github: Arc::clone(github),
-            config: config.clone(),
-        }
+        let github = if let Some(x) = github {
+            x
+        } else {
+            Arc::new(create_github_client(&*config.token).unwrap())
+        };
+
+        RepoComponent { github, config }
     }
 }

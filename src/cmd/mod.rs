@@ -1,18 +1,26 @@
 use std::collections::HashMap;
 use std::env::args;
 
+use anyhow::anyhow;
 use async_trait::async_trait;
 use clap::{App, ArgMatches, SubCommand};
 
 use crate::log::init_log;
-use crate::result::Result;
+use crate::result::{CmdResult, Result};
 
 pub(crate) mod issue;
 pub(crate) mod note;
 
-pub(crate) type CmdResult = Result<()>;
 pub(crate) type CmdBox = Box<dyn CommandTrait + Send + Sync>;
 pub(crate) type CmdGroup = HashMap<&'static str, CmdBox>;
+
+fn check_github_args(matches: &ArgMatches) -> Result<()> {
+    if matches.is_present("owner") && matches.is_present("repo") && matches.is_present("token") {
+        return Ok(());
+    }
+
+    Err(anyhow!("GitHub owner, repo, and token are mandatory"))
+}
 
 pub(crate) struct CommandSetting {
     name: &'static str,

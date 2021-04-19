@@ -79,10 +79,8 @@ pub(crate) struct NoteComponent {
 }
 
 impl NoteComponent {
-    pub fn new(config: &Arc<NoteConfig>) -> impl NoteComponentTrait {
-        NoteComponent {
-            config: config.clone(),
-        }
+    pub fn new(config: Arc<NoteConfig>) -> impl NoteComponentTrait {
+        NoteComponent { config }
     }
 }
 
@@ -90,7 +88,7 @@ impl NoteComponent {
 impl NoteComponentTrait for NoteComponent {
     async fn create_note(&self) -> Result<String> {
         let github = Arc::new(create_github_client(&self.config.token)?);
-        let repo_component = RepoComponent::new(&github, self.config.clone());
+        let repo_component = RepoComponent::new(Some(github), self.config.clone());
 
         let issues = repo_component.list_issues().await?;
         self.render_note(&issues)
