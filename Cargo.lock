@@ -574,7 +574,7 @@ checksum = "494b4d60369511e7dea41cf646832512a94e542f68bb9c49e54518e0f468eb47"
 [[package]]
 name = "hubcaps"
 version = "0.6.2"
-source = "git+https://github.com/innobead/hubcaps#931adbeded7d5684ee27ada0e0f3837cc9d4a352"
+source = "git+https://github.com/innobead/hubcaps#904a44c3724b3fab0e157c0571597e7cccbad884"
 dependencies = [
  "base64 0.13.0",
  "data-encoding",
@@ -1260,6 +1260,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
+ "chrono",
  "clap",
  "dirs 3.0.1",
  "hubcaps",

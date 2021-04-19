@@ -1,10 +1,11 @@
 use anyhow::anyhow;
 use async_trait::async_trait;
+use log::{debug, error, info, trace};
+use tokio_stream::StreamExt;
+
 use hubcaps::issues::{Issue, IssueListOptions, IssueOptions, Sort, State};
 use hubcaps::milestone::{Milestone, MilestoneListOptions};
 use hubcaps::search::{IssuesItem, IssuesSort, SearchIssuesOptions};
-use log::error;
-use tokio_stream::StreamExt;
 
 use crate::component::repo::release::ReleaseComponentTrait;
 use crate::component::repo::RepoComponent;
@@ -29,7 +30,7 @@ pub(crate) trait IssueComponentTrait {
     async fn list_issues(&self) -> Result<Vec<Issue>>;
     async fn search_issues_by_labels(&self, labels: &Vec<String>) -> Result<Vec<Issue>>;
     async fn search_issues_by_query(&self, query: &str) -> Result<Vec<Issue>>;
-    async fn update_issues(&self, issues: &Vec<IssueOptions>) -> Result<()>;
+    async fn update_issues(&self, issues: &Vec<(u64, IssueOptions)>) -> Result<()>;
     async fn get_milestone(&self, milestone: &str) -> Result<Milestone>;
     fn filter_issue(&self, issue: &Issue) -> bool;
 }
@@ -37,6 +38,8 @@ pub(crate) trait IssueComponentTrait {
 #[async_trait]
 impl IssueComponentTrait for RepoComponent {
     async fn list_issues(&self) -> Result<Vec<Issue>> {
+        debug!("listing issues");
+
         let mut issues: Vec<Issue> = vec![];
 
         let mut found_issues = self
@@ -53,6 +56,8 @@ impl IssueComponentTrait for RepoComponent {
     }
 
     async fn search_issues_by_labels(&self, labels: &Vec<String>) -> Result<Vec<Issue>> {
+        debug!("searching issues by labels: {:?}", labels);
+
         let repo = self
             .github
             .repo(self.config.owner.clone(), self.config.repo.clone());
@@ -92,11 +97,17 @@ impl IssueComponentTrait for RepoComponent {
     }
 
     async fn search_issues_by_query(&self, query: &str) -> Result<Vec<Issue>> {
+        debug!("Searching issues by query: {}", query);
+
         let search_options = SearchIssuesOptions::builder()
             .sort(IssuesSort::Created)
             .build();
 
-        let mut search_query: Vec<String> = query.split(" ").map(|it| it.to_string()).collect();
+        let mut search_query: Vec<String> = if query.is_empty() {
+            vec![]
+        } else {
+            query.split(" ").map(|it| it.to_string()).collect()
+        };
         search_query.push(format!("repo:{}/{}", self.config.owner, self.config.repo));
 
         if let Some(milestone) = &self.config.milestone {
@@ -148,19 +159,23 @@ impl IssueComponentTrait for RepoComponent {
         Ok(issues)
     }
 
-    async fn update_issues(&self, issues: &Vec<IssueOptions>) -> Result<()> {
+    async fn update_issues(&self, issues: &Vec<(u64, IssueOptions)>) -> Result<()> {
+        info!("updating issues: {:?}", issues);
+
         let repo = self
             .github
             .repo(self.config.owner.clone(), self.config.repo.clone());
 
-        for issue in issues {
-            repo.issues().update(issue).await?;
+        for (issue_number, issue) in issues {
+            repo.issues().update(issue_number, issue).await?;
         }
 
         Ok(())
     }
 
     async fn get_milestone(&self, milestone: &str) -> Result<Milestone> {
+        debug!("getting milestone: {}", milestone);
+
         let repo = self
             .github
             .repo(self.config.owner.clone(), self.config.repo.clone());
@@ -179,6 +194,8 @@ impl IssueComponentTrait for RepoComponent {
     }
 
     fn filter_issue(&self, issue: &Issue) -> bool {
+        trace!("filtering issue: {:?}", issue);
+
         let exclude_issue_numbers = self.config.exclude_issues.clone().unwrap_or(vec![]);
 
         // filter excluded issues

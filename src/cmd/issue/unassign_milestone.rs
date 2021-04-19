@@ -53,15 +53,20 @@ impl CommandTrait for UnassignMilestoneCommand {
         );
 
         let issues_to_update: Vec<_> = issues
-            .iter()
-            .map(|it| IssueOptions {
-                title: it.title.clone(),
-                body: it.body.clone(),
-                assignee: None,
-                assignees: Some(it.assignees.iter().map(|it| it.login.clone()).collect()),
-                milestone: None,
-                labels: it.labels.iter().map(|it| it.name.clone()).collect(),
-                state: it.state.clone(),
+            .into_iter()
+            .map(|it| {
+                (
+                    it.number,
+                    IssueOptions {
+                        title: it.title,
+                        body: it.body,
+                        assignee: None,
+                        assignees: Some(it.assignees.into_iter().map(|it| it.login).collect()),
+                        milestone: Some(0),
+                        labels: it.labels.into_iter().map(|it| it.name).collect(),
+                        state: it.state,
+                    },
+                )
             })
             .collect();
 

@@ -1,8 +1,10 @@
 use std::collections::{HashMap, HashSet};
+use std::fs;
 use std::sync::Arc;
 
 use async_trait::async_trait;
 use hubcaps::issues::Issue;
+use log::{debug, info, trace};
 use serde::{Deserialize, Serialize};
 use tera::{from_value, to_value, Context, Tera, Value};
 
@@ -11,7 +13,6 @@ use crate::component::repo::RepoComponent;
 use crate::config::NoteConfig;
 use crate::result::Result;
 use crate::util::create_github_client;
-use std::fs;
 
 const ISSUE_SECTION_TEMPLATE: &'static str = r#"
 {% for section in sections %}
@@ -87,6 +88,8 @@ impl NoteComponent {
 #[async_trait]
 impl NoteComponentTrait for NoteComponent {
     async fn create_note(&self) -> Result<String> {
+        info!("creating note");
+
         let github = Arc::new(create_github_client(&self.config.token)?);
         let repo_component = RepoComponent::new(Some(github), self.config.clone());
 
@@ -95,11 +98,15 @@ impl NoteComponentTrait for NoteComponent {
     }
 
     fn render_note(&self, issues: &Vec<Issue>) -> Result<String> {
+        info!("rendering note: issue count: {}", issues.len());
+
         // let mut issue_sections: Vec<IssueSection> = vec![];
         let mut issue_sections: HashMap<String, IssueSection> = hashmap! {};
         let highlight_labels = self.config.highlight_labels.clone().unwrap_or_default();
 
         'outer: for issue in issues.iter() {
+            debug!("processing issue: {:?}", issue);
+
             let issue_labels: Vec<_> = issue.labels.iter().map(|it| &it.name).collect();
 
             let issue_summary = IssueSummary {
@@ -171,6 +178,8 @@ impl NoteComponentTrait for NoteComponent {
         let mut context = Context::new();
         context.insert("sections", &issue_sections);
         context.insert("assignees", &assignees);
+
+        trace!("prepared render context: {:?}", context);
 
         let mut output = tera.render("issue-sections", &context)?;
         if let Some(mut note_template) = self.config.note.clone() {

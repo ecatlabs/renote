@@ -55,6 +55,11 @@ impl CommandTrait for SearchIssueCommand {
             repo_component.search_issues_by_query(matches.value_of("query").unwrap_or_default()).await?;
         );
 
+        if issues.is_empty() {
+            progress!("Issues not found", ());
+            return Ok(());
+        }
+
         let output_format = get_output_format_from_args(&matches)?;
         output!(output_format, .display(
             stdout(),

@@ -1,7 +1,14 @@
+use std::sync::Arc;
+
 use async_trait::async_trait;
 use clap::{App, Arg, ArgMatches, SubCommand};
+use libcli_rs::progress::{ProgressBar, ProgressTrait};
 
-use crate::cmd::{CommandSetting, CommandTrait};
+use crate::cmd::issue::{create_issues_info_to_update, IssueLabelUpdateType};
+use crate::cmd::{check_github_args, CommandSetting, CommandTrait};
+use crate::component::repo::issue::IssueComponentTrait;
+use crate::component::repo::RepoComponent;
+use crate::config::NoteConfig;
 use crate::result::CmdResult;
 
 pub(crate) const CMD_ADD_LABEL: &str = "add-label";
@@ -22,7 +29,7 @@ impl CommandTrait for AddLabelCommand {
 
     fn app<'a, 'b>(&self) -> App<'a, 'b> {
         SubCommand::with_name(CMD_ADD_LABEL)
-            .about("Add label to issues")
+            .about("Add labels to issues")
             .visible_alias("al")
             .args(&[
                 Arg::with_name("query")
@@ -41,7 +48,32 @@ impl CommandTrait for AddLabelCommand {
             ])
     }
 
-    async fn process<'a>(&self, _matches: &ArgMatches<'a>) -> CmdResult {
-        todo!()
+    async fn process<'a>(&self, matches: &ArgMatches<'a>) -> CmdResult {
+        check_github_args(&matches)?;
+
+        let config = NoteConfig::new(matches);
+        let repo_component = RepoComponent::new(None, Arc::new(config));
+        let query = matches.value_of("query").unwrap_or_default();
+        let labels: Vec<_> = matches
+            .values_of("labels")
+            .unwrap()
+            .map(|it| it.to_string())
+            .collect();
+
+        let issues_to_update = create_issues_info_to_update(
+            &repo_component,
+            query,
+            &labels,
+            &IssueLabelUpdateType::Add,
+        )
+        .await?;
+
+        progress!(
+            format!("Updating issues to add the labels ({:?})", labels),
+            repo_component.update_issues(&issues_to_update).await?;
+        );
+
+        println!("Successfully updated issues to add the labels {:?}", labels);
+        Ok(())
     }
 }

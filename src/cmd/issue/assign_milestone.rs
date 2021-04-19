@@ -2,8 +2,9 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 use clap::{App, Arg, ArgMatches, SubCommand};
-use hubcaps::issues::IssueOptions;
 use libcli_rs::progress::{ProgressBar, ProgressTrait};
+
+use hubcaps::issues::IssueOptions;
 
 use crate::cmd::{check_github_args, CommandSetting, CommandTrait};
 use crate::component::repo::issue::IssueComponentTrait;
@@ -62,26 +63,31 @@ impl CommandTrait for AssignMilestoneCommand {
             .get_milestone(matches.value_of("milestone").unwrap())
             .await?;
         let issues_to_update: Vec<_> = issues
-            .iter()
-            .map(|it| IssueOptions {
-                title: it.title.clone(),
-                body: it.body.clone(),
-                assignee: None,
-                assignees: Some(it.assignees.iter().map(|it| it.login.clone()).collect()),
-                milestone: Some(milestone.number),
-                labels: it.labels.iter().map(|it| it.name.clone()).collect(),
-                state: it.state.clone(),
+            .into_iter()
+            .map(|it| {
+                (
+                    it.number,
+                    IssueOptions {
+                        title: it.title,
+                        body: it.body,
+                        assignee: None,
+                        assignees: Some(it.assignees.into_iter().map(|it| it.login).collect()),
+                        milestone: Some(milestone.number),
+                        labels: it.labels.into_iter().map(|it| it.name).collect(),
+                        state: it.state,
+                    },
+                )
             })
             .collect();
 
         progress!(
-            format!("Updating issues to the milestone {:?}", milestone),
+            format!("Updating issues to the milestone {}", milestone.title),
             repo_component.update_issues(&issues_to_update).await?;
         );
 
         println!(
-            "Successfully updated issues to the milestone {:?}",
-            milestone
+            "Successfully updated issues to the milestone {}",
+            milestone.title
         );
         Ok(())
     }

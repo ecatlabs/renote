@@ -1,16 +1,17 @@
 #![allow(where_clauses_object_safety)]
 
 #[macro_use]
-extern crate maplit;
-#[macro_use]
 extern crate libcli_rs;
+#[macro_use]
+extern crate maplit;
+
+use std::process::exit;
 
 use clap::{App, Arg};
 
 use crate::cmd::issue::*;
 use crate::cmd::note::*;
 use crate::cmd::{create_cmd, get_app_matches, CmdGroup};
-use std::process::exit;
 
 mod cmd;
 mod component;
@@ -28,8 +29,8 @@ async fn main() {
     let sub_commands: Vec<_> = commands.values().map(|it| it.app()).collect();
 
     let app = App::new("renote")
-        .version(option_env!("BUILD_VERSION").unwrap_or(""))
-        .about("GitHub Release Note CLI")
+        .long_version(env!("LONG_VERSION"))
+        .about("A complementary Github tool to use with gh to extend note/issue/... experience")
         .subcommands(sub_commands)
         .args(&[
             Arg::with_name("token")
@@ -84,7 +85,7 @@ async fn main() {
             .process(sub_matches)
             .await
         {
-            eprintln!("Error: {:?}", err);
+            eprintln!("error: {:?}", err);
             exit(1);
         }
     }
