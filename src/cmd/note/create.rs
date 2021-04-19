@@ -1,14 +1,15 @@
 use std::fs::File;
 use std::path::Path;
+use std::sync::Arc;
 
 use async_trait::async_trait;
 use clap::{App, Arg, ArgMatches, SubCommand};
+use libcli_rs::progress::{ProgressBar, ProgressTrait};
 
 use crate::cmd::{CommandSetting, CommandTrait};
 use crate::component::note::{NoteComponent, NoteComponentTrait};
 use crate::config::NoteConfig;
 use crate::result::CmdResult;
-use std::sync::Arc;
 
 pub const CMD_CREATE_NOTE: &str = "create";
 
@@ -56,8 +57,9 @@ impl CommandTrait for CreateNoteCommand {
         }
 
         let note_component = NoteComponent::new(Arc::new(note_config));
-        println!("{}", note_component.create_note().await?);
+        let output = progress!("Creating the note", note_component.create_note().await?);
 
+        println!("{}", output);
         Ok(())
     }
 }

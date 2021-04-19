@@ -2,7 +2,7 @@ owner: longhorn
 repo: longhorn
 token: ""
 state: closed
-note: >-
+note: >- # or file path
   ## Release Note
 
   ## Upgrade
