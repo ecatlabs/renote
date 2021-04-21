@@ -1,3 +1,5 @@
+[![crates.io](https://img.shields.io/crates/v/renote.svg)](https://crates.io/crates/renote)
+
 # What's Renote
 
 **Renote** is a CLI to extend GitHub operation experience, which is a complementary tool to use with **gh** [GitHub’s official command line tool](https://github.com/cli/cli).
