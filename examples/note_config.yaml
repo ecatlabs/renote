@@ -14,6 +14,7 @@ extra_contributors:
 exclude_issues:
   - 304
   - 508
+  - 1701
 sort: asc            # asc, desc
 labels: []
 any_labels: []
@@ -21,6 +22,7 @@ exclude_labels:
   - area/test
   - area/test-infra
   - kind/task
+  - kind/environment-issues
   - wontfix
 highlight_labels:
   - label: highlight
