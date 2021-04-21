@@ -4,7 +4,7 @@ use async_trait::async_trait;
 use clap::{App, Arg, ArgMatches, SubCommand};
 use libcli_rs::progress::{ProgressBar, ProgressTrait};
 
-use hubcaps::issues::IssueOptions;
+use hubcaps_ex::issues::IssueOptions;
 
 use crate::cmd::{check_github_args, CommandSetting, CommandTrait};
 use crate::component::repo::issue::IssueComponentTrait;

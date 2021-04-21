@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use hubcaps::Github;
+use hubcaps_ex::Github;
 
 use crate::component::repo::issue::IssueComponentTrait;
 use crate::component::repo::release::ReleaseComponentTrait;

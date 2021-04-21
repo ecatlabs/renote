@@ -572,9 +572,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "494b4d60369511e7dea41cf646832512a94e542f68bb9c49e54518e0f468eb47"
 
 [[package]]
-name = "hubcaps"
+name = "hubcaps-ex"
 version = "0.6.2"
-source = "git+https://github.com/innobead/hubcaps#904a44c3724b3fab0e157c0571597e7cccbad884"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "973cee330436939ccf16f8db6628690f3c4189c65f73c9cdb01743da3e0c7497"
 dependencies = [
  "base64 0.13.0",
  "data-encoding",
@@ -1256,14 +1257,14 @@ dependencies = [
 
 [[package]]
 name = "renote"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "async-trait",
  "chrono",
  "clap",
  "dirs 3.0.1",
- "hubcaps",
+ "hubcaps-ex",
  "lazy_static",
  "libcli-rs",
  "log",
@@ -1504,9 +1505,9 @@ dependencies = [
 
 [[package]]
 name = "slab"
-version = "0.4.2"
+version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c111b5bd5695e56cffe5129854aa230b39c93a305372fdbb2668ca2394eea9f8"
+checksum = "f173ac3d1a7e3b28003f40de0b5ce7fe2710f9b9dc3fc38664cebee46b3b6527"
 
 [[package]]
 name = "smallvec"

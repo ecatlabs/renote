@@ -1,4 +1,4 @@
-use hubcaps::{Credentials, Github};
+use hubcaps_ex::{Credentials, Github};
 
 use crate::result::Result;
 use anyhow::anyhow;

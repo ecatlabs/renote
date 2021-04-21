@@ -3,7 +3,7 @@ use std::fs;
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use hubcaps::issues::Issue;
+use hubcaps_ex::issues::Issue;
 use log::{debug, info, trace};
 use serde::{Deserialize, Serialize};
 use tera::{from_value, to_value, Context, Tera, Value};

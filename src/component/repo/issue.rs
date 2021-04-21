@@ -3,9 +3,9 @@ use async_trait::async_trait;
 use log::{debug, error, info, trace};
 use tokio_stream::StreamExt;
 
-use hubcaps::issues::{Issue, IssueListOptions, IssueOptions, Sort, State};
-use hubcaps::milestone::{Milestone, MilestoneListOptions};
-use hubcaps::search::{IssuesItem, IssuesSort, SearchIssuesOptions};
+use hubcaps_ex::issues::{Issue, IssueListOptions, IssueOptions, Sort, State};
+use hubcaps_ex::milestone::{Milestone, MilestoneListOptions};
+use hubcaps_ex::search::{IssuesItem, IssuesSort, SearchIssuesOptions};
 
 use crate::component::repo::release::ReleaseComponentTrait;
 use crate::component::repo::RepoComponent;

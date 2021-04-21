@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 use clap::{App, Arg, ArgMatches, SubCommand};
-use hubcaps::issues::IssueOptions;
+use hubcaps_ex::issues::IssueOptions;
 use libcli_rs::progress::{ProgressBar, ProgressTrait};
 
 use crate::cmd::{check_github_args, CmdResult, CommandSetting, CommandTrait};

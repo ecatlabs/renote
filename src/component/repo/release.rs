@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use hubcaps::releases::Release;
+use hubcaps_ex::releases::Release;
 use log::debug;
 
 use crate::component::repo::RepoComponent;
