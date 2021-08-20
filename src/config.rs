@@ -8,6 +8,7 @@ pub(crate) struct NoteConfig {
     pub token: String,
     pub state: String,
     pub note: Option<String>,
+    pub since: Option<String>,
     pub milestone: Option<String>,
     pub show_contributor: bool,
     pub extra_contributors: Option<Vec<String>>,

@@ -165,8 +165,12 @@ impl NoteComponentTrait for NoteComponent {
             .into_iter()
             .collect();
 
-        if let Some(mut contributors) = self.config.extra_contributors.clone() {
-            assignees.append(&mut contributors);
+        if let Some(contributors) = self.config.extra_contributors.clone() {
+            for contributor in contributors {
+                if !assignees.contains(&contributor) {
+                    assignees.push(contributor.clone());
+                }
+            }
         }
 
         assignees.sort();

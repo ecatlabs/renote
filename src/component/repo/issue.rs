@@ -62,13 +62,21 @@ impl IssueComponentTrait for RepoComponent {
             .github
             .repo(self.config.owner.clone(), self.config.repo.clone());
 
-        let latest_release = self.get_latest_release().await?;
+        let since_time = match self.config.since {
+            Some(ref x) => {
+                x.clone()
+                // let a = NaiveDate::parse_from_str(x, "%Y-%m-%d")?;
+                // a.format("YYYY-MM-DDThh:mmTZD").to_string()
+            }
+            None => self.get_latest_release().await?.created_at,
+        };
+
         let mut search_options_builder = IssueListOptions::builder();
         search_options_builder
             .labels(labels.clone())
             .state(to_issue_state(&self.config.state))
             .sort(Sort::Created)
-            .since(&latest_release.created_at);
+            .since(since_time);
         if let Some(IssueSort::Asc) = &self.config.sort {
             search_options_builder.asc();
         }

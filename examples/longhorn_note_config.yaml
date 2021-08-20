@@ -1,0 +1,52 @@
+---
+owner: longhorn
+repo: longhorn
+token: ""
+state: all           # open, closed, all
+note: |-             # string or file path
+  ## Release Note
+
+  **v1.2.0 RC 1 released!** 🎆
+
+  This release includes several important enhancements and lots of bug fixes as highlighted. Thanks for all the contributions!
+
+  ## Installation
+
+  Longhorn supports 3 installation ways including Rancher catalog, Kubectl, and Helm. Follow the installation instructions [here](https://v1-2-0--longhornio.netlify.app/docs/1.2.0/deploy/install/).
+
+  ## Upgrade
+
+  The live upgrade from v1.1.* is not supported until the GA release. When available, follow the upgrade instructions [here](https://v1-2-0--longhornio.netlify.app/docs/1.2.0/deploy/upgrade/).
+  {content}
+
+milestone: v1.2.0
+show_contributor: true
+extra_contributors:
+  - innobead
+exclude_issues: []
+sort: asc            # asc, desc
+since: "2021-04-24T13:52:18Z"
+labels: []
+any_labels: []
+exclude_labels:
+  - area/test
+  - area/test-infra
+  - kind/environment-issues
+  - wontfix
+  - duplicated
+highlight_labels:
+  - label: highlight
+    title: Highlights
+    description: ~
+  - label: kind/enhancement
+    title: Enhancements
+    description: ~
+  - label: area/performance
+    title: Performance
+    description: ~
+  - label: area/stability
+    title: Stability
+    description: ~
+  - label: kind/bug
+    title: Bugs
+    description: ~
