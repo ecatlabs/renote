@@ -107,43 +107,53 @@ impl IssueComponentTrait for RepoComponent {
     }
 
     async fn search_issues_by_query(&self, query: &str) -> Result<Vec<Issue>> {
+        use std::fmt::{Write, Display};
         debug!("Searching issues by query: {}", query);
 
         let search_options = SearchIssuesOptions::builder()
             .sort(IssuesSort::Created)
             .build();
 
-        let mut search_query: Vec<String> = if query.is_empty() {
-            vec![]
-        } else {
-            query.split(" ").map(|it| it.to_string()).collect()
-        };
-        search_query.push(format!("repo:{}/{}", self.config.owner, self.config.repo));
+        fn add_filter(query: &mut String, filter: &str, args: impl Display) {
+            write!(query, "{}:{} ", filter, args).unwrap();
+        }
+
+        let mut query = query.to_owned();
+        if !query.is_empty() {
+            query.push(' ');
+        }
+
+        add_filter(&mut query, "repo", format_args!("{}/{}", self.config.owner, self.config.repo));
 
         if let Some(milestone) = &self.config.milestone {
-            search_query.push(format!("milestone:{}", milestone));
+            add_filter(&mut query, "milestone", milestone);
         }
 
         if !self.config.state.is_empty() {
-            search_query.push(format!("is:{}", &self.config.state));
+            add_filter(&mut query, "is", &self.config.state);
         }
 
-        let labels = self.config.labels.clone().unwrap_or(vec![]);
-        for label in &labels {
-            search_query.push(format!("label:{}", label))
+        if let Some(labels) = &self.config.labels {
+            for label in labels {
+                add_filter(&mut query, "label", label);
+            }
         }
 
-        for label in self.config.exclude_labels.clone().unwrap_or(vec![]) {
-            search_query.push(format!("-label:{}", label));
+        if let Some(labels) = &self.config.exclude_labels {
+            for label in labels {
+                add_filter(&mut query, "-label", label);
+            }
         }
 
-        let search_query = search_query.join(" ");
+        if query.ends_with(' ') {
+            query.pop();
+        }
 
         let issues: Vec<_> = self
             .github
             .search()
             .issues()
-            .iter(search_query, &search_options)
+            .iter(query, &search_options)
             .filter_map(|it| {
                 if let Err(err) = it {
                     error!("failed to parse the issue: {}", err);

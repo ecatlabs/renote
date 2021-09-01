@@ -60,8 +60,13 @@ fn assignees_str(args: &HashMap<String, Value>) -> tera::Result<Value> {
     match args.get("value") {
         Some(val) => match from_value::<Vec<String>>(val.clone()) {
             Ok(assignees) => {
-                let assignees: Vec<_> = assignees.iter().map(|it| format!("@{}", it)).collect();
-                Ok(to_value(assignees.join(" ")).unwrap())
+                use std::fmt::Write;
+                let mut str = String::with_capacity(assignees.len() * 3);
+                for assignee in assignees.iter() {
+                    write!(&mut str, "@{} ", assignee).unwrap();
+                }
+                str.pop();
+                Ok(to_value(str)?)
             }
             Err(_) => Err("".into()),
         },
