@@ -54,11 +54,7 @@ impl CommandTrait for RemoveLabelCommand {
         let config = NoteConfig::new(matches);
         let repo_component = RepoComponent::new(None, Arc::new(config));
         let query = matches.value_of("query").unwrap_or_default();
-        let labels: Vec<_> = matches
-            .values_of("labels")
-            .unwrap()
-            .map(|it| it.to_string())
-            .collect();
+        let labels: Vec<_> = matches.values_of("labels").unwrap().collect();
 
         let issues_to_update = create_issues_info_to_update(
             &repo_component,

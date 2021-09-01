@@ -157,22 +157,17 @@ impl NoteComponentTrait for NoteComponent {
         let mut issue_sections: Vec<_> = issue_sections.values().collect();
         issue_sections.sort_by(|a, b| a.index.partial_cmp(&b.index).unwrap());
 
-        let assignees: Vec<_> = issues.iter().flat_map(|it| &it.assignees).collect();
-        let mut assignees: Vec<_> = assignees
-            .into_iter()
-            .map(|it| it.login.clone())
-            .collect::<HashSet<_>>()
-            .into_iter()
-            .collect();
+        let mut assignees = issues
+            .iter()
+            .flat_map(|it| &it.assignees)
+            .map(|x| x.login.as_str())
+            .collect::<HashSet<_>>();
 
-        if let Some(contributors) = self.config.extra_contributors.clone() {
-            for contributor in contributors {
-                if !assignees.contains(&contributor) {
-                    assignees.push(contributor.clone());
-                }
-            }
+        if let Some(contributors) = &self.config.extra_contributors {
+            assignees.extend(contributors.iter().map(|s| s.as_str()));
         }
 
+        let mut assignees: Vec<_> = assignees.into_iter().collect();
         assignees.sort();
 
         let mut tera = Tera::default();
