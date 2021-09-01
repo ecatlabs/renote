@@ -28,7 +28,7 @@ fn to_issue(issue_item: &IssuesItem) -> Result<Issue> {
 #[async_trait]
 pub(crate) trait IssueComponentTrait {
     async fn list_issues(&self) -> Result<Vec<Issue>>;
-    async fn search_issues_by_labels(&self, labels: &Vec<String>) -> Result<Vec<Issue>>;
+    async fn search_issues_by_labels(&self, labels: &[String]) -> Result<Vec<Issue>>;
     async fn search_issues_by_query(&self, query: &str) -> Result<Vec<Issue>>;
     async fn update_issues(&self, issues: &Vec<(u64, IssueOptions)>) -> Result<()>;
     async fn get_milestone(&self, milestone: &str) -> Result<Milestone>;
@@ -42,20 +42,22 @@ impl IssueComponentTrait for RepoComponent {
 
         let mut issues: Vec<Issue> = vec![];
 
-        let mut found_issues = self
-            .search_issues_by_labels(&self.config.labels.clone().unwrap_or(vec![]))
-            .await?;
-        issues.append(&mut found_issues);
-
-        for label in self.config.any_labels.clone().unwrap_or(vec![]) {
-            let mut found_issues = self.search_issues_by_labels(&vec![label]).await?;
+        if let Some(labels) = &self.config.labels {
+            let mut found_issues = self.search_issues_by_labels(labels).await?;
             issues.append(&mut found_issues);
+        }
+
+        if let Some(labels) = &self.config.any_labels {
+            for label in labels {
+                let mut found_issues = self.search_issues_by_labels(&[label.clone()]).await?;
+                issues.append(&mut found_issues);
+            }
         }
 
         Ok(issues)
     }
 
-    async fn search_issues_by_labels(&self, labels: &Vec<String>) -> Result<Vec<Issue>> {
+    async fn search_issues_by_labels(&self, labels: &[String]) -> Result<Vec<Issue>> {
         debug!("searching issues by labels: {:?}", labels);
 
         let repo = self
@@ -73,7 +75,7 @@ impl IssueComponentTrait for RepoComponent {
 
         let mut search_options_builder = IssueListOptions::builder();
         search_options_builder
-            .labels(labels.clone())
+            .labels(labels.to_vec())
             .state(to_issue_state(&self.config.state))
             .sort(Sort::Created)
             .since(since_time);
@@ -204,10 +206,8 @@ impl IssueComponentTrait for RepoComponent {
     fn filter_issue(&self, issue: &Issue) -> bool {
         trace!("filtering issue: {:?}", issue);
 
-        let exclude_issue_numbers = self.config.exclude_issues.clone().unwrap_or(vec![]);
-
         // filter excluded issues
-        if !exclude_issue_numbers.is_empty() {
+        if let Some(exclude_issue_numbers) = &self.config.exclude_issues {
             if exclude_issue_numbers.contains(&issue.number) {
                 return false;
             }
@@ -226,11 +226,8 @@ impl IssueComponentTrait for RepoComponent {
 
         // filter exclude_labels
         if let Some(labels) = &self.config.exclude_labels {
-            let issue_labels: Vec<_> = issue.labels.iter().map(|it| &it.name).collect();
-            for label in labels {
-                if issue_labels.contains(&label) {
-                    return false;
-                }
+            if issue.labels.iter().any(|l| labels.contains(&l.name)) {
+                return false;
             }
         }
 

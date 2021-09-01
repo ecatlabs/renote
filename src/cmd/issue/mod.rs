@@ -57,7 +57,7 @@ enum IssueLabelUpdateType {
 async fn create_issues_info_to_update(
     repo_component: &(dyn IssueComponentTrait + Send + Sync),
     query: &str,
-    filtered_labels: &Vec<String>,
+    filtered_labels: &[&str],
     update_type: &IssueLabelUpdateType,
 ) -> Result<Vec<(u64, IssueOptions)>> {
     let issues = progress!(
@@ -65,20 +65,17 @@ async fn create_issues_info_to_update(
         repo_component.search_issues_by_query(query).await?;
     );
 
-    let issues_info: Vec<_> = issues
+    let issues_info = issues
         .into_iter()
         .map(|it| {
-            let mut labels: Vec<_> = it.labels.iter().map(|it| it.name.clone()).collect();
-
-            if let IssueLabelUpdateType::Add = update_type {
-                labels.append(&mut filtered_labels.clone());
+            let iter = it.labels.iter().map(|it| it.name.clone());
+            let labels = if matches!(update_type, IssueLabelUpdateType::Add) {
+                iter.chain(filtered_labels.iter().map(|l| l.to_string()))
+                    .collect()
             } else {
-                labels = labels
-                    .iter()
-                    .filter(|it| !filtered_labels.contains(it))
-                    .map(|it| it.clone())
-                    .collect();
-            }
+                iter.filter(|l| !filtered_labels.contains(&l.as_str()))
+                    .collect()
+            };
 
             (
                 it.number,
