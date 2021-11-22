@@ -2,9 +2,10 @@
 name = "renote"
 version = "0.1.1"
 authors = ["David Ko <innobead@gmail.com>"]
-edition = "2018"
+edition = "2021"
+rust-version = "1.56"
 description = "renote, a complementary tool to use with gh to extend GitHub operation experience"
-keywords = ["cli"]
+keywords = ["cli", "github", "release"]
 categories = ["command-line-utilities"]
 homepage = "https://github.com/ecatlabs/renote"
 repository = "https://github.com/ecatlabs/renote"
