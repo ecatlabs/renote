@@ -31,7 +31,7 @@ impl CommandTrait for AssignMilestoneCommand {
         Command::new(CMD_ASSIGN_MILESTONE)
             .about("Assign issues to a milestone")
             .visible_alias("am")
-            .args(&[
+            .args([
                 Arg::new("query")
                     .help("Issue filter query")
                     .long_help("Issue query by https://docs.github.com/en/github/searching-for-information-on-github/searching-issues-and-pull-requests")

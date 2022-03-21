@@ -2,7 +2,7 @@ PROJECT := $(shell basename $(CURDIR))
 COMMIT := $(shell git rev-parse --short HEAD 2>/dev/null)-$(shell date "+%Y%m%d%H%M%S")
 TAG := $(shell git describe --tags --dirty 2>/dev/null)
 BUILD_DIR := $(CURDIR)/.target
-ARTIFACT_NAME := $(shell $(CURDIR)/hack/artifact-name.sh)
+ARTIFACT_NAME := $(shell $(CURDIR)/hack/generate-artifact-name.sh)
 BUILD_CACHE_DIR := $(CURDIR)/.cache
 
 .PHONY: help

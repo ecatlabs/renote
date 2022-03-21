@@ -31,7 +31,7 @@ impl CommandTrait for RemoveLabelCommand {
         Command::new(CMD_REMOVE_LABEL)
             .about("Remove labels from issues")
             .visible_alias("rl")
-            .args(&[
+            .args([
                 Arg::new("query")
                     .help("Issue filter query")
                     .long_help("Issue query by https://docs.github.com/en/github/searching-for-information-on-github/searching-issues-and-pull-requests")

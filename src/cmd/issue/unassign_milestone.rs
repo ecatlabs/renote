@@ -30,7 +30,7 @@ impl CommandTrait for UnassignMilestoneCommand {
         Command::new(CMD_UNASSIGN_MILESTONE)
             .about("Unassign issues from a milestone")
             .visible_alias("um")
-            .args(&[
+            .args([
                 Arg::new("query")
                     .help("Issue filter query")
                     .long_help("Issue query by https://docs.github.com/en/github/searching-for-information-on-github/searching-issues-and-pull-requests")

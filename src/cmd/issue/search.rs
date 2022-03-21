@@ -33,7 +33,7 @@ impl CommandTrait for SearchIssueCommand {
         Command::new(CMD_ISSUE_SEARCH)
             .about("Search issues")
             .visible_alias("s")
-            .args(&[
+            .args([
                 Arg::new("query")
                     .help("Issue filter query")
                     .long_help("Issue query by https://docs.github.com/en/github/searching-for-information-on-github/searching-issues-and-pull-requests")

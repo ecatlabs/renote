@@ -32,7 +32,7 @@ async fn main() {
         .long_version(env!("LONG_VERSION"))
         .about("A complementary Github tool to use with gh to extend note/issue/... experience")
         .subcommands(sub_commands)
-        .args(&[
+        .args([
             Arg::new("token")
                 .value_name("string")
                 .help("GitHub personal access token")
@@ -65,7 +65,7 @@ async fn main() {
                 .short('l')
                 .takes_value(true)
                 .default_value("error")
-                .possible_values(&["off", "error", "warn", "info", "debug", "trace"]),
+                .possible_values(["off", "error", "warn", "info", "debug", "trace"]),
             Arg::new("format")
                 .value_name("format")
                 .help("Output format")
@@ -74,7 +74,7 @@ async fn main() {
                 .short('f')
                 .takes_value(true)
                 .default_value("console")
-                .possible_values(&["console", "json", "yaml"]),
+                .possible_values(["console", "json", "yaml"]),
         ]);
 
     let matches = get_app_matches(app);

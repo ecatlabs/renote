@@ -31,7 +31,7 @@ impl CommandTrait for AddLabelCommand {
         Command::new(CMD_ADD_LABEL)
             .about("Add labels to issues")
             .visible_alias("al")
-            .args(&[
+            .args([
                 Arg::new("query")
                     .help("Issue filter query")
                     .long_help("Issue query by https://docs.github.com/en/github/searching-for-information-on-github/searching-issues-and-pull-requests")
