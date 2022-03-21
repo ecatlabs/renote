@@ -38,6 +38,10 @@ impl CommandTrait for CreateNoteCommand {
                 .takes_value(true)])
     }
 
+    fn validate(&self, _matches: &ArgMatches) -> CmdResult {
+        Ok(())
+    }
+
     async fn process(&self, matches: &ArgMatches) -> CmdResult {
         let config_path = matches.value_of("config").unwrap();
         let file = File::open(Path::new(config_path))

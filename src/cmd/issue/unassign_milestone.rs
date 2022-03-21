@@ -5,7 +5,7 @@ use clap::{Arg, ArgMatches, Command};
 use hubcaps_ex::issues::IssueOptions;
 use libcli_rs::progress::{ProgressBar, ProgressTrait};
 
-use crate::cmd::{check_github_args, CmdResult, CommandSetting, CommandTrait};
+use crate::cmd::{CmdResult, CommandSetting, CommandTrait};
 use crate::component::repo::issue::IssueComponentTrait;
 use crate::component::repo::RepoComponent;
 use crate::config::NoteConfig;
@@ -42,8 +42,6 @@ impl CommandTrait for UnassignMilestoneCommand {
     }
 
     async fn process(&self, matches: &ArgMatches) -> CmdResult {
-        check_github_args(&matches)?;
-
         let config = NoteConfig::new(matches);
         let repo_component = RepoComponent::new(None, Arc::new(config));
 

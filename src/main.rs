@@ -9,9 +9,10 @@ use std::process::exit;
 
 use clap::{Arg, Command};
 
+use crate::cmd::{CmdGroup, create_cmd, get_app_matches};
 use crate::cmd::issue::*;
 use crate::cmd::note::*;
-use crate::cmd::{create_cmd, get_app_matches, CmdGroup};
+use crate::result::CmdResult;
 
 mod cmd;
 mod component;
@@ -77,16 +78,25 @@ async fn main() {
                 .possible_values(["console", "json", "yaml"]),
         ]);
 
-    let matches = get_app_matches(app);
-    if let Some((command_name, sub_matches)) = matches.subcommand() {
-        if let Err(err) = commands
-            .get(command_name)
-            .unwrap()
-            .process(sub_matches)
-            .await
-        {
+    if let Some((cmd, matches)) = get_app_matches(app).subcommand() {
+        let cmd = commands.get(cmd).expect("command found");
+        if let Err(err) = error_handle([
+            cmd.validate(matches),
+            cmd.process(matches).await]
+        ) {
             eprintln!("{:?}", err);
             exit(1);
         }
     }
+}
+
+fn error_handle<T>(results: T) -> CmdResult
+    where T: IntoIterator<Item=CmdResult> {
+    for r in results {
+        if r.is_err() {
+            return r;
+        }
+    }
+
+    Ok(())
 }

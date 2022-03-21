@@ -27,6 +27,10 @@ impl CommandTrait for NodeConfigCommand {
             .visible_alias("t")
     }
 
+    fn validate(&self, _matches: &ArgMatches) -> CmdResult {
+        Ok(())
+    }
+
     async fn process(&self, _matches: &ArgMatches) -> CmdResult {
         let mut issue = NoteConfig::default();
         issue.highlight_labels = Some(vec![HighlightLabelConfig::default()]);
