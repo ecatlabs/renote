@@ -8,13 +8,15 @@ use libcli_rs::output::OutputFormat;
 use crate::result::Result;
 
 pub fn create_github_client(token: &str) -> Result<Github> {
-    let client = Github::new("renote", Credentials::Token(token.to_string()))?;
+    let client = Github::new(
+        env!("CARGO_PKG_NAME"),
+        Credentials::Token(token.to_string()),
+    )?;
+
     Ok(client)
 }
 
 pub fn get_output_format_from_args(args: &ArgMatches) -> Result<OutputFormat> {
-    match OutputFormat::from_str(args.value_of("format").unwrap()) {
-        Ok(o) => Ok(o),
-        Err(err) => Err(anyhow!("{:?}", err)),
-    }
+    let format = args.value_of("format").unwrap();
+    OutputFormat::from_str(format).map_err(|err| anyhow!("{:?}", err))
 }

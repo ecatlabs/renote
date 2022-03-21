@@ -4,8 +4,8 @@ use async_trait::async_trait;
 use clap::{Arg, ArgMatches, Command};
 use libcli_rs::progress::{ProgressBar, ProgressTrait};
 
-use crate::cmd::{check_github_args, CommandSetting, CommandTrait};
 use crate::cmd::issue::{create_issues_info_to_update, IssueLabelUpdateType};
+use crate::cmd::{check_github_args, CommandSetting, CommandTrait};
 use crate::component::repo::issue::IssueComponentTrait;
 use crate::component::repo::RepoComponent;
 use crate::config::NoteConfig;
@@ -62,7 +62,7 @@ impl CommandTrait for RemoveLabelCommand {
             &labels,
             &IssueLabelUpdateType::Remove,
         )
-            .await?;
+        .await?;
 
         progress!(
             format!("Updating issues to remove the labels ({:?})", labels),

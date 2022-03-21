@@ -9,9 +9,9 @@ use std::process::exit;
 
 use clap::{Arg, Command};
 
-use crate::cmd::{CmdGroup, create_cmd, get_app_matches};
 use crate::cmd::issue::*;
 use crate::cmd::note::*;
+use crate::cmd::{create_cmd, get_app_matches, CmdGroup};
 
 mod cmd;
 mod component;
@@ -85,7 +85,7 @@ async fn main() {
             .process(sub_matches)
             .await
         {
-            eprintln!("error: {:?}", err);
+            eprintln!("{:?}", err);
             exit(1);
         }
     }
