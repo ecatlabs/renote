@@ -3,7 +3,7 @@ use std::env::args;
 
 use anyhow::anyhow;
 use async_trait::async_trait;
-use clap::{App, ArgMatches, SubCommand};
+use clap::{ArgMatches, Command};
 
 use crate::log::init_log;
 use crate::result::{CmdResult, Result};
@@ -32,7 +32,7 @@ pub(crate) struct CommandSetting {
 pub(crate) trait CommandTrait {
     fn setting(&self) -> &CommandSetting;
 
-    fn app<'a, 'b>(&self) -> App<'a, 'b> {
+    fn app<'help>(&self) -> Command<'help> {
         let sub_commands: Vec<_> = self
             .setting()
             .commands
@@ -40,17 +40,17 @@ pub(crate) trait CommandTrait {
             .map(|it| it.app())
             .collect();
 
-        SubCommand::with_name(self.setting().name)
+        Command::new(self.setting().name)
             .about(self.setting().about)
             .subcommands(sub_commands)
     }
 
-    async fn process<'a>(&self, matches: &ArgMatches<'a>) -> CmdResult {
+    async fn process(&self, matches: &ArgMatches) -> CmdResult {
         if let Some(log_level) = matches.value_of("log-level") {
             init_log(log_level)?;
         }
 
-        if let (command_name, Some(sub_matches)) = matches.subcommand() {
+        if let Some((command_name, sub_matches)) = matches.subcommand() {
             self.setting()
                 .commands
                 .get(command_name)
@@ -61,12 +61,13 @@ pub(crate) trait CommandTrait {
             return Ok(());
         }
 
-        println!("{}", matches.usage());
+        //FIXME
+        // println!("{}", matches.usage());
         Ok(())
     }
 }
 
-pub(crate) fn get_app_matches<'a, 'b>(app: App<'a, 'b>) -> ArgMatches<'a> {
+pub(crate) fn get_app_matches(app: Command) -> ArgMatches {
     let mut args = args();
     match args {
         _ if args.len() == 1 => {

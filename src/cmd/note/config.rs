@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use clap::{App, ArgMatches, SubCommand};
+use clap::{ArgMatches, Command};
 
 use crate::cmd::{CommandSetting, CommandTrait};
 use crate::config::{HighlightLabelConfig, NoteConfig};
@@ -21,13 +21,13 @@ impl CommandTrait for NodeConfigCommand {
         unimplemented!()
     }
 
-    fn app<'a, 'b>(&self) -> App<'a, 'b> {
-        SubCommand::with_name(CMD_NODE_CONFIG)
+    fn app<'hellp>(&self) -> Command<'hellp> {
+        Command::new(CMD_NODE_CONFIG)
             .about("Generate template")
             .visible_alias("t")
     }
 
-    async fn process<'a>(&self, _matches: &ArgMatches<'a>) -> CmdResult {
+    async fn process(&self, _matches: &ArgMatches) -> CmdResult {
         let mut issue = NoteConfig::default();
         issue.highlight_labels = Some(vec![HighlightLabelConfig::default()]);
 

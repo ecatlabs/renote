@@ -3,7 +3,7 @@ use std::path::Path;
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use clap::{App, Arg, ArgMatches, SubCommand};
+use clap::{Arg, ArgMatches, Command};
 use libcli_rs::progress::{ProgressBar, ProgressTrait};
 
 use crate::cmd::{CommandSetting, CommandTrait};
@@ -27,18 +27,18 @@ impl CommandTrait for CreateNoteCommand {
         unimplemented!()
     }
 
-    fn app<'a, 'b>(&self) -> App<'a, 'b> {
-        SubCommand::with_name(CMD_CREATE_NOTE)
+    fn app<'help>(&self) -> Command<'help> {
+        Command::new(CMD_CREATE_NOTE)
             .about("Create the release note")
             .visible_alias("c")
-            .args(&[Arg::with_name("config")
+            .args(&[Arg::new("config")
                 .help("Issue search config yaml file")
                 .long("config")
                 .required(true)
                 .takes_value(true)])
     }
 
-    async fn process<'a>(&self, matches: &ArgMatches<'a>) -> CmdResult {
+    async fn process(&self, matches: &ArgMatches) -> CmdResult {
         let config_path = matches.value_of("config").unwrap();
         let file = File::open(Path::new(config_path))
             .expect(format!("expect {} found", config_path).as_str());

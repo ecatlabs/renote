@@ -17,24 +17,24 @@ license-file = "LICENSE"
 chrono = "0.4"
 
 [dependencies]
-clap = "2"
-log = "0.4"
-pretty_env_logger = "0.4"
-lazy_static = "1.4"
-anyhow = "1.0"
-dirs = "3.0"
-semver = "0.11"
+clap = { version = "3.1.6", features = ["env"] }
+log = "0.4.14"
+pretty_env_logger = "0.4.0"
+lazy_static = "1.4.0"
+anyhow = "1.0.56"
+dirs = "4.0.0"
+semver = "1.0.6"
 hubcaps-ex = "0.6.2"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 serde_yaml = "0.8"
-async-trait = "0.1"
+async-trait = "0.1.52"
 reqwest = { version = "0.11", features = ["json"] }
 tokio = { version = "1", features = ["full"] }
 tokio-stream = "0.1.5"
 maplit = "1.0"
 tera = { version = "1", default-features = false }
-regex = "1.4.5"
+regex = "1.5.5"
 libcli-rs = "0.1"
 chrono = "0.4"
 

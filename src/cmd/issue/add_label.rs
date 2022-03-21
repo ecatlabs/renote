@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use clap::{App, Arg, ArgMatches, SubCommand};
+use clap::{Arg, ArgMatches, Command};
 use libcli_rs::progress::{ProgressBar, ProgressTrait};
 
 use crate::cmd::issue::{create_issues_info_to_update, IssueLabelUpdateType};
@@ -27,28 +27,28 @@ impl CommandTrait for AddLabelCommand {
         unimplemented!()
     }
 
-    fn app<'a, 'b>(&self) -> App<'a, 'b> {
-        SubCommand::with_name(CMD_ADD_LABEL)
+    fn app<'help>(&self) -> Command<'help> {
+        Command::new(CMD_ADD_LABEL)
             .about("Add labels to issues")
             .visible_alias("al")
             .args(&[
-                Arg::with_name("query")
+                Arg::new("query")
                     .help("Issue filter query")
                     .long_help("Issue query by https://docs.github.com/en/github/searching-for-information-on-github/searching-issues-and-pull-requests")
-                    .short("q")
+                    .short('q')
                     .long("query")
-                    .value_delimiter(" ")
+                    .value_delimiter(' ')
                     .takes_value(true),
-                Arg::with_name("labels")
+                Arg::new("labels")
                     .help("Labels to add")
                     .long("labels")
-                    .value_delimiter(" ")
+                    .value_delimiter(' ')
                     .required(true)
                     .takes_value(true),
             ])
     }
 
-    async fn process<'a>(&self, matches: &ArgMatches<'a>) -> CmdResult {
+    async fn process(&self, matches: &ArgMatches) -> CmdResult {
         check_github_args(&matches)?;
 
         let config = NoteConfig::new(matches);

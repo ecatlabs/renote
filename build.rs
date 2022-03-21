@@ -7,9 +7,7 @@ fn main() {
         .unwrap_or_else(|| format!("v{}", env!("CARGO_PKG_VERSION")));
 
     let commit = command("git", ["rev-parse", "--short", "HEAD"]).unwrap_or_default();
-
     let timestamp = Utc::now().format("%Y%m%d%H%M%S");
-
     let version = format!("{} Commit: {}-{}", short_version, commit, timestamp);
 
     println!("cargo:rustc-env=VERSION={}", short_version);

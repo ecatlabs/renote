@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use clap::{App, Arg, ArgMatches, SubCommand};
+use clap::{Arg, ArgMatches, Command};
 use hubcaps_ex::issues::IssueOptions;
 use libcli_rs::progress::{ProgressBar, ProgressTrait};
 
@@ -26,22 +26,22 @@ impl CommandTrait for UnassignMilestoneCommand {
         unimplemented!()
     }
 
-    fn app<'a, 'b>(&self) -> App<'a, 'b> {
-        SubCommand::with_name(CMD_UNASSIGN_MILESTONE)
+    fn app<'help>(&self) -> Command<'help> {
+        Command::new(CMD_UNASSIGN_MILESTONE)
             .about("Unassign issues from a milestone")
             .visible_alias("um")
             .args(&[
-                Arg::with_name("query")
+                Arg::new("query")
                     .help("Issue filter query")
                     .long_help("Issue query by https://docs.github.com/en/github/searching-for-information-on-github/searching-issues-and-pull-requests")
-                    .short("q")
+                    .short('q')
                     .long("query")
-                    .value_delimiter(" ")
+                    .value_delimiter(' ')
                     .takes_value(true),
             ])
     }
 
-    async fn process<'a>(&self, matches: &ArgMatches<'a>) -> CmdResult {
+    async fn process(&self, matches: &ArgMatches) -> CmdResult {
         check_github_args(&matches)?;
 
         let config = NoteConfig::new(matches);

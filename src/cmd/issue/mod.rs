@@ -1,9 +1,9 @@
 use async_trait::async_trait;
+use hubcaps_ex::issues::IssueOptions;
 use libcli_rs::progress::{ProgressBar, ProgressTrait};
 
 pub(crate) use add_label::{AddLabelCommand, CMD_ADD_LABEL};
 pub(crate) use assign_milestone::{AssignMilestoneCommand, CMD_ASSIGN_MILESTONE};
-use hubcaps_ex::issues::IssueOptions;
 pub(crate) use remove_label::{RemoveLabelCommand, CMD_REMOVE_LABEL};
 pub(crate) use unassign_milestone::{UnassignMilestoneCommand, CMD_UNASSIGN_MILESTONE};
 

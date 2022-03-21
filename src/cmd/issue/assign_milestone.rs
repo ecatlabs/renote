@@ -1,10 +1,9 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use clap::{App, Arg, ArgMatches, SubCommand};
-use libcli_rs::progress::{ProgressBar, ProgressTrait};
-
+use clap::{Arg, ArgMatches, Command};
 use hubcaps_ex::issues::IssueOptions;
+use libcli_rs::progress::{ProgressBar, ProgressTrait};
 
 use crate::cmd::{check_github_args, CommandSetting, CommandTrait};
 use crate::component::repo::issue::IssueComponentTrait;
@@ -28,19 +27,19 @@ impl CommandTrait for AssignMilestoneCommand {
         unimplemented!()
     }
 
-    fn app<'a, 'b>(&self) -> App<'a, 'b> {
-        SubCommand::with_name(CMD_ASSIGN_MILESTONE)
+    fn app<'help>(&self) -> Command<'help> {
+        Command::new(CMD_ASSIGN_MILESTONE)
             .about("Assign issues to a milestone")
             .visible_alias("am")
             .args(&[
-                Arg::with_name("query")
+                Arg::new("query")
                     .help("Issue filter query")
                     .long_help("Issue query by https://docs.github.com/en/github/searching-for-information-on-github/searching-issues-and-pull-requests")
-                    .short("q")
+                    .short('q')
                     .long("query")
-                    .value_delimiter(" ")
+                    .value_delimiter(' ')
                     .takes_value(true),
-                Arg::with_name("milestone")
+                Arg::new("milestone")
                     .value_name("milestone")
                     .help("Milestone")
                     .required(true)
@@ -48,7 +47,7 @@ impl CommandTrait for AssignMilestoneCommand {
             ])
     }
 
-    async fn process<'a>(&self, matches: &ArgMatches<'a>) -> CmdResult {
+    async fn process(&self, matches: &ArgMatches) -> CmdResult {
         check_github_args(&matches)?;
 
         let config = NoteConfig::new(matches);

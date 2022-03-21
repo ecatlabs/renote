@@ -1,10 +1,11 @@
-use hubcaps_ex::{Credentials, Github};
+use std::str::FromStr;
 
-use crate::result::Result;
 use anyhow::anyhow;
 use clap::ArgMatches;
+use hubcaps_ex::{Credentials, Github};
 use libcli_rs::output::OutputFormat;
-use std::str::FromStr;
+
+use crate::result::Result;
 
 pub(crate) fn create_github_client(token: &str) -> Result<Github> {
     let client = Github::new("renote", Credentials::Token(token.to_string()))?;

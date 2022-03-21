@@ -1,11 +1,10 @@
 use anyhow::anyhow;
 use async_trait::async_trait;
-use log::{debug, error, info, trace};
-use tokio_stream::StreamExt;
-
 use hubcaps_ex::issues::{Issue, IssueListOptions, IssueOptions, Sort, State};
 use hubcaps_ex::milestone::{Milestone, MilestoneListOptions};
 use hubcaps_ex::search::{IssuesItem, IssuesSort, SearchIssuesOptions};
+use log::{debug, error, info, trace};
+use tokio_stream::StreamExt;
 
 use crate::component::repo::release::ReleaseComponentTrait;
 use crate::component::repo::RepoComponent;
@@ -107,7 +106,7 @@ impl IssueComponentTrait for RepoComponent {
     }
 
     async fn search_issues_by_query(&self, query: &str) -> Result<Vec<Issue>> {
-        use std::fmt::{Write, Display};
+        use std::fmt::{Display, Write};
         debug!("Searching issues by query: {}", query);
 
         let search_options = SearchIssuesOptions::builder()
@@ -123,7 +122,11 @@ impl IssueComponentTrait for RepoComponent {
             query.push(' ');
         }
 
-        add_filter(&mut query, "repo", format_args!("{}/{}", self.config.owner, self.config.repo));
+        add_filter(
+            &mut query,
+            "repo",
+            format_args!("{}/{}", self.config.owner, self.config.repo),
+        );
 
         if let Some(milestone) = &self.config.milestone {
             add_filter(&mut query, "milestone", milestone);
