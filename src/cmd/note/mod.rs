@@ -2,8 +2,8 @@ use async_trait::async_trait;
 
 pub use create::*;
 
-use crate::cmd::note::config::{NodeConfigCommand, CMD_NODE_CONFIG};
-use crate::cmd::{create_cmd, CommandSetting, CommandTrait};
+use crate::cmd::{CommandSetting, CommandTrait, create_cmd};
+use crate::cmd::note::config::{CMD_NODE_CONFIG, NodeConfigCommand};
 
 mod config;
 mod create;

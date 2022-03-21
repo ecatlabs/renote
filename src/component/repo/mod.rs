@@ -7,10 +7,10 @@ use crate::component::repo::release::ReleaseComponentTrait;
 use crate::config::NoteConfig;
 use crate::util::create_github_client;
 
-pub(crate) mod issue;
-pub(crate) mod release;
+pub mod issue;
+pub mod release;
 
-pub(crate) struct RepoComponent {
+pub struct RepoComponent {
     github: Arc<Github>,
     config: Arc<NoteConfig>,
 }

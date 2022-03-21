@@ -11,9 +11,9 @@ use crate::component::repo::RepoComponent;
 use crate::config::NoteConfig;
 use crate::result::CmdResult;
 
-pub(crate) const CMD_ASSIGN_MILESTONE: &str = "assign-milestone";
+pub const CMD_ASSIGN_MILESTONE: &str = "assign-milestone";
 
-pub(crate) struct AssignMilestoneCommand;
+pub struct AssignMilestoneCommand;
 
 impl AssignMilestoneCommand {
     pub fn new() -> Self {

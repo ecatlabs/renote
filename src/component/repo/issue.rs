@@ -25,7 +25,7 @@ fn to_issue(issue_item: &IssuesItem) -> Result<Issue> {
 }
 
 #[async_trait]
-pub(crate) trait IssueComponentTrait {
+pub trait IssueComponentTrait {
     async fn list_issues(&self) -> Result<Vec<Issue>>;
     async fn search_issues_by_labels(&self, labels: &[String]) -> Result<Vec<Issue>>;
     async fn search_issues_by_query(&self, query: &str) -> Result<Vec<Issue>>;

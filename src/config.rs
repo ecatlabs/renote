@@ -2,7 +2,7 @@ use clap::ArgMatches;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Default, Clone)]
-pub(crate) struct NoteConfig {
+pub struct NoteConfig {
     pub owner: String,
     pub repo: String,
     pub token: String,
@@ -21,7 +21,7 @@ pub(crate) struct NoteConfig {
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]
-pub(crate) enum IssueSort {
+pub enum IssueSort {
     #[serde(rename = "asc")]
     Asc,
     #[serde(rename = "desc")]
@@ -29,7 +29,7 @@ pub(crate) enum IssueSort {
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Default, Clone)]
-pub(crate) struct HighlightLabelConfig {
+pub struct HighlightLabelConfig {
     pub label: String,
     pub title: Option<String>,
     pub description: Option<String>,

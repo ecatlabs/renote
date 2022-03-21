@@ -10,9 +10,9 @@ use crate::component::repo::issue::IssueComponentTrait;
 use crate::component::repo::RepoComponent;
 use crate::config::NoteConfig;
 
-pub(crate) const CMD_UNASSIGN_MILESTONE: &str = "unassign-milestone";
+pub const CMD_UNASSIGN_MILESTONE: &str = "unassign-milestone";
 
-pub(crate) struct UnassignMilestoneCommand;
+pub struct UnassignMilestoneCommand;
 
 impl UnassignMilestoneCommand {
     pub fn new() -> Self {

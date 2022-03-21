@@ -6,7 +6,7 @@ use crate::component::repo::RepoComponent;
 use crate::result::Result;
 
 #[async_trait]
-pub(crate) trait ReleaseComponentTrait {
+pub trait ReleaseComponentTrait {
     async fn get_latest_release(&self) -> Result<Release>;
 }
 

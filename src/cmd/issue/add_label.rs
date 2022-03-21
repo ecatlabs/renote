@@ -4,16 +4,16 @@ use async_trait::async_trait;
 use clap::{Arg, ArgMatches, Command};
 use libcli_rs::progress::{ProgressBar, ProgressTrait};
 
-use crate::cmd::issue::{create_issues_info_to_update, IssueLabelUpdateType};
 use crate::cmd::{check_github_args, CommandSetting, CommandTrait};
+use crate::cmd::issue::{create_issues_info_to_update, IssueLabelUpdateType};
 use crate::component::repo::issue::IssueComponentTrait;
 use crate::component::repo::RepoComponent;
 use crate::config::NoteConfig;
 use crate::result::CmdResult;
 
-pub(crate) const CMD_ADD_LABEL: &str = "add-label";
+pub const CMD_ADD_LABEL: &str = "add-label";
 
-pub(crate) struct AddLabelCommand;
+pub struct AddLabelCommand;
 
 impl AddLabelCommand {
     pub fn new() -> Self {
@@ -62,7 +62,7 @@ impl CommandTrait for AddLabelCommand {
             &labels,
             &IssueLabelUpdateType::Add,
         )
-        .await?;
+            .await?;
 
         progress!(
             format!("Updating issues to add the labels ({:?})", labels),

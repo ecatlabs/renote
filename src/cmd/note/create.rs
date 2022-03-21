@@ -31,13 +31,11 @@ impl CommandTrait for CreateNoteCommand {
         Command::new(CMD_CREATE_NOTE)
             .about("Create the release note")
             .visible_alias("c")
-            .args([
-                Arg::new("config")
-                    .help("Issue search config yaml file")
-                    .long("config")
-                    .required(true)
-                    .takes_value(true)
-            ])
+            .args([Arg::new("config")
+                .help("Issue search config yaml file")
+                .long("config")
+                .required(true)
+                .takes_value(true)])
     }
 
     async fn process(&self, matches: &ArgMatches) -> CmdResult {

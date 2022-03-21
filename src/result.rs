@@ -1,3 +1,3 @@
-pub(crate) type Result<T> = anyhow::Result<T>;
+pub type Result<T> = anyhow::Result<T>;
 
-pub(crate) type CmdResult = Result<()>;
+pub type CmdResult = Result<()>;

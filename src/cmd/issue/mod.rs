@@ -2,13 +2,13 @@ use async_trait::async_trait;
 use hubcaps_ex::issues::IssueOptions;
 use libcli_rs::progress::{ProgressBar, ProgressTrait};
 
-pub(crate) use add_label::{AddLabelCommand, CMD_ADD_LABEL};
-pub(crate) use assign_milestone::{AssignMilestoneCommand, CMD_ASSIGN_MILESTONE};
-pub(crate) use remove_label::{RemoveLabelCommand, CMD_REMOVE_LABEL};
-pub(crate) use unassign_milestone::{UnassignMilestoneCommand, CMD_UNASSIGN_MILESTONE};
+pub use add_label::{AddLabelCommand, CMD_ADD_LABEL};
+pub use assign_milestone::{AssignMilestoneCommand, CMD_ASSIGN_MILESTONE};
+pub use remove_label::{CMD_REMOVE_LABEL, RemoveLabelCommand};
+pub use unassign_milestone::{CMD_UNASSIGN_MILESTONE, UnassignMilestoneCommand};
 
-use crate::cmd::issue::search::{SearchIssueCommand, CMD_ISSUE_SEARCH};
-use crate::cmd::{create_cmd, CommandSetting, CommandTrait};
+use crate::cmd::{CommandSetting, CommandTrait, create_cmd};
+use crate::cmd::issue::search::{CMD_ISSUE_SEARCH, SearchIssueCommand};
 use crate::component::repo::issue::IssueComponentTrait;
 use crate::result::Result;
 
@@ -18,7 +18,7 @@ mod remove_label;
 mod search;
 mod unassign_milestone;
 
-pub(crate) const CMD_ISSUE: &str = "issue";
+pub const CMD_ISSUE: &str = "issue";
 
 pub struct IssueCommand {
     setting: CommandSetting,

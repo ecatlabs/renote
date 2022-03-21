@@ -1,2 +1,2 @@
-pub(crate) mod note;
-pub(crate) mod repo;
+pub mod note;
+pub mod repo;

@@ -6,7 +6,7 @@ use async_trait::async_trait;
 use hubcaps_ex::issues::Issue;
 use log::{debug, info, trace};
 use serde::{Deserialize, Serialize};
-use tera::{from_value, to_value, Context, Tera, Value};
+use tera::{Context, from_value, Tera, to_value, Value};
 
 use crate::component::repo::issue::IssueComponentTrait;
 use crate::component::repo::RepoComponent;
@@ -75,12 +75,12 @@ fn assignees_str(args: &HashMap<String, Value>) -> tera::Result<Value> {
 }
 
 #[async_trait]
-pub(crate) trait NoteComponentTrait {
+pub trait NoteComponentTrait {
     async fn create_note(&self) -> Result<String>;
     fn render_note(&self, issues: &Vec<Issue>) -> Result<String>;
 }
 
-pub(crate) struct NoteComponent {
+pub struct NoteComponent {
     config: Arc<NoteConfig>,
 }
 

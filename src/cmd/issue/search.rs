@@ -13,9 +13,9 @@ use crate::config::NoteConfig;
 use crate::result::CmdResult;
 use crate::util::get_output_format_from_args;
 
-pub(crate) const CMD_ISSUE_SEARCH: &str = "search";
+pub const CMD_ISSUE_SEARCH: &str = "search";
 
-pub(crate) struct SearchIssueCommand;
+pub struct SearchIssueCommand;
 
 impl SearchIssueCommand {
     pub fn new() -> Self {

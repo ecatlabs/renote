@@ -8,11 +8,11 @@ use clap::{ArgMatches, Command};
 use crate::log::init_log;
 use crate::result::{CmdResult, Result};
 
-pub(crate) mod issue;
-pub(crate) mod note;
+pub mod issue;
+pub mod note;
 
-pub(crate) type CmdBox = Box<dyn CommandTrait + Send + Sync>;
-pub(crate) type CmdGroup = HashMap<&'static str, CmdBox>;
+pub type CmdBox = Box<dyn CommandTrait + Send + Sync>;
+pub type CmdGroup = HashMap<&'static str, CmdBox>;
 
 fn check_github_args(matches: &ArgMatches) -> Result<()> {
     if matches.is_present("owner") && matches.is_present("repo") && matches.is_present("token") {
@@ -22,14 +22,14 @@ fn check_github_args(matches: &ArgMatches) -> Result<()> {
     Err(anyhow!("GitHub owner, repo, and token are mandatory"))
 }
 
-pub(crate) struct CommandSetting {
+pub struct CommandSetting {
     name: &'static str,
     about: &'static str,
     commands: CmdGroup,
 }
 
 #[async_trait]
-pub(crate) trait CommandTrait {
+pub trait CommandTrait {
     fn setting(&self) -> &CommandSetting;
 
     fn app<'help>(&self) -> Command<'help> {
@@ -67,7 +67,7 @@ pub(crate) trait CommandTrait {
     }
 }
 
-pub(crate) fn get_app_matches(app: Command) -> ArgMatches {
+pub fn get_app_matches(app: Command) -> ArgMatches {
     let mut args = args();
     match args {
         _ if args.len() == 1 => {
@@ -78,6 +78,6 @@ pub(crate) fn get_app_matches(app: Command) -> ArgMatches {
     }
 }
 
-pub(crate) fn create_cmd(c: CmdBox) -> CmdBox {
+pub fn create_cmd(c: CmdBox) -> CmdBox {
     c
 }
