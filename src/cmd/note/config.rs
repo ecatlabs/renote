@@ -21,7 +21,7 @@ impl CommandTrait for NodeConfigCommand {
         unimplemented!()
     }
 
-    fn app<'hellp>(&self) -> Command<'hellp> {
+    fn app<'help>(&self) -> Command<'help> {
         Command::new(CMD_NODE_CONFIG)
             .about("Generate template")
             .visible_alias("t")
