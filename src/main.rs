@@ -14,7 +14,6 @@ use crate::cmd::{create_cmd, get_app_matches, CmdGroup};
 mod cmd;
 mod component;
 mod config;
-mod log;
 mod result;
 mod util;
 

@@ -24,7 +24,7 @@ fmt: ## Format & Lint codes
 
 .PHONY: fix
 fix:  ## Fix code
-	cargo fix --allow-dirty || cargo fix --allow-staged
+	cargo fix --allow-dirty --allow-staged
 
 .PHONY: udep
 udep: ## Check undepedencies

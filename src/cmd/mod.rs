@@ -5,8 +5,8 @@ use anyhow::anyhow;
 use async_trait::async_trait;
 use clap::{ArgMatches, Command};
 
-use crate::log::init_log;
 use crate::result::{CmdResult, Result};
+use crate::util::init_log;
 
 mod arg;
 pub mod issue;
