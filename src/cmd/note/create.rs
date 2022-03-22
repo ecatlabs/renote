@@ -6,7 +6,7 @@ use async_trait::async_trait;
 use clap::{Arg, ArgMatches, Command};
 use libcli_rs::progress::{ProgressBar, ProgressTrait};
 
-use crate::cmd::{CommandSetting, CommandTrait};
+use crate::cmd::CommandTrait;
 use crate::component::note::{NoteComponent, NoteComponentTrait};
 use crate::config::NoteConfig;
 use crate::result::CmdResult;
@@ -23,10 +23,6 @@ impl CreateNoteCommand {
 
 #[async_trait]
 impl CommandTrait for CreateNoteCommand {
-    fn setting(&self) -> &CommandSetting {
-        unimplemented!()
-    }
-
     fn app<'help>(&self) -> Command<'help> {
         Command::new(CMD_CREATE_NOTE)
             .about("Create the release note")
@@ -50,9 +46,6 @@ impl CommandTrait for CreateNoteCommand {
             serde_yaml::from_reader(file).expect("expect node config file");
 
         // override by the global settings
-        if matches.is_present("token") {
-            note_config.token = matches.value_of("token").unwrap().to_string();
-        }
         if matches.is_present("owner") {
             note_config.owner = matches.value_of("owner").unwrap().to_string();
         }

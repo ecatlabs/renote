@@ -6,7 +6,7 @@ use async_trait::async_trait;
 use hubcaps_ex::issues::Issue;
 use log::{debug, info, trace};
 use serde::{Deserialize, Serialize};
-use tera::{Context, from_value, Tera, to_value, Value};
+use tera::{from_value, to_value, Context, Tera, Value};
 
 use crate::component::repo::issue::IssueComponentTrait;
 use crate::component::repo::RepoComponent;

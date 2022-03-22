@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use clap::{ArgMatches, Command};
 
-use crate::cmd::{CommandSetting, CommandTrait};
+use crate::cmd::CommandTrait;
 use crate::config::{HighlightLabelConfig, NoteConfig};
 use crate::result::CmdResult;
 
@@ -17,10 +17,6 @@ impl NodeConfigCommand {
 
 #[async_trait]
 impl CommandTrait for NodeConfigCommand {
-    fn setting(&self) -> &CommandSetting {
-        unimplemented!()
-    }
-
     fn app<'help>(&self) -> Command<'help> {
         Command::new(CMD_NODE_CONFIG)
             .about("Generate template")

@@ -4,8 +4,9 @@ use async_trait::async_trait;
 use clap::{Arg, ArgMatches, Command};
 use libcli_rs::progress::{ProgressBar, ProgressTrait};
 
-use crate::cmd::{CommandSetting, CommandTrait};
+use crate::cmd::arg::create_query_arg;
 use crate::cmd::issue::{create_issues_info_to_update, IssueLabelUpdateType};
+use crate::cmd::CommandTrait;
 use crate::component::repo::issue::IssueComponentTrait;
 use crate::component::repo::RepoComponent;
 use crate::config::NoteConfig;
@@ -23,22 +24,12 @@ impl RemoveLabelCommand {
 
 #[async_trait]
 impl CommandTrait for RemoveLabelCommand {
-    fn setting(&self) -> &CommandSetting {
-        unimplemented!()
-    }
-
     fn app<'help>(&self) -> Command<'help> {
         Command::new(CMD_REMOVE_LABEL)
             .about("Remove labels from issues")
             .visible_alias("rl")
             .args([
-                Arg::new("query")
-                    .help("Issue filter query")
-                    .long_help("Issue query by https://docs.github.com/en/github/searching-for-information-on-github/searching-issues-and-pull-requests")
-                    .short('q')
-                    .long("query")
-                    .value_delimiter(' ')
-                    .takes_value(true),
+                create_query_arg(),
                 Arg::new("labels")
                     .help("Labels to remove")
                     .long("labels")
@@ -60,7 +51,7 @@ impl CommandTrait for RemoveLabelCommand {
             &labels,
             &IssueLabelUpdateType::Remove,
         )
-            .await?;
+        .await?;
 
         progress!(
             format!("Updating issues to remove the labels ({:?})", labels),

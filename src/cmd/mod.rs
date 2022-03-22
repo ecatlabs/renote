@@ -5,10 +5,10 @@ use anyhow::anyhow;
 use async_trait::async_trait;
 use clap::{ArgMatches, Command};
 
-use crate::error_handle;
 use crate::log::init_log;
 use crate::result::{CmdResult, Result};
 
+mod arg;
 pub mod issue;
 pub mod note;
 
@@ -23,7 +23,9 @@ pub struct CommandSetting {
 
 #[async_trait]
 pub trait CommandTrait {
-    fn setting(&self) -> &CommandSetting;
+    fn setting(&self) -> &CommandSetting {
+        unimplemented!()
+    }
 
     fn app<'help>(&self) -> Command<'help> {
         let sub_commands: Vec<_> = self
@@ -47,17 +49,15 @@ pub trait CommandTrait {
             init_log(log_level)?;
         }
 
-        if let Some((command_name, sub_matches)) = matches.subcommand() {
-            let cmd = self
-                .setting()
-                .commands
-                .get(command_name)
-                .expect("command found");
+        if let Some((cmd, sub_matches)) = matches.subcommand() {
+            let cmd = self.setting().commands.get(cmd).unwrap();
 
-            return error_handle([
-                cmd.validate(sub_matches),
-                cmd.process(sub_matches).await,
-            ]);
+            let result = self.validate(matches);
+            if result.is_err() {
+                return result;
+            }
+
+            return cmd.process(sub_matches).await;
         }
 
         Ok(self.app().print_help()?)

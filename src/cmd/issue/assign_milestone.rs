@@ -5,7 +5,8 @@ use clap::{Arg, ArgMatches, Command};
 use hubcaps_ex::issues::IssueOptions;
 use libcli_rs::progress::{ProgressBar, ProgressTrait};
 
-use crate::cmd::{CommandSetting, CommandTrait};
+use crate::cmd::arg::create_query_arg;
+use crate::cmd::CommandTrait;
 use crate::component::repo::issue::IssueComponentTrait;
 use crate::component::repo::RepoComponent;
 use crate::config::NoteConfig;
@@ -23,22 +24,12 @@ impl AssignMilestoneCommand {
 
 #[async_trait]
 impl CommandTrait for AssignMilestoneCommand {
-    fn setting(&self) -> &CommandSetting {
-        unimplemented!()
-    }
-
     fn app<'help>(&self) -> Command<'help> {
         Command::new(CMD_ASSIGN_MILESTONE)
             .about("Assign issues to a milestone")
             .visible_alias("am")
             .args([
-                Arg::new("query")
-                    .help("Issue filter query")
-                    .long_help("Issue query by https://docs.github.com/en/github/searching-for-information-on-github/searching-issues-and-pull-requests")
-                    .short('q')
-                    .long("query")
-                    .value_delimiter(' ')
-                    .takes_value(true),
+                create_query_arg(),
                 Arg::new("milestone")
                     .value_name("milestone")
                     .help("Milestone")

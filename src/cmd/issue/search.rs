@@ -2,11 +2,12 @@ use std::io::stdout;
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use clap::{Arg, ArgMatches, Command};
+use clap::{ArgMatches, Command};
 use libcli_rs::output::{OutputFactory, OutputTrait};
 use libcli_rs::progress::{ProgressBar, ProgressTrait};
 
-use crate::cmd::{CommandSetting, CommandTrait};
+use crate::cmd::arg::create_query_arg;
+use crate::cmd::CommandTrait;
 use crate::component::repo::issue::IssueComponentTrait;
 use crate::component::repo::RepoComponent;
 use crate::config::NoteConfig;
@@ -25,23 +26,11 @@ impl SearchIssueCommand {
 
 #[async_trait]
 impl CommandTrait for SearchIssueCommand {
-    fn setting(&self) -> &CommandSetting {
-        unimplemented!()
-    }
-
     fn app<'help>(&self) -> Command<'help> {
         Command::new(CMD_ISSUE_SEARCH)
             .about("Search issues")
             .visible_alias("s")
-            .args([
-                Arg::new("query")
-                    .help("Issue filter query")
-                    .long_help("Issue query by https://docs.github.com/en/github/searching-for-information-on-github/searching-issues-and-pull-requests")
-                    .short('q')
-                    .long("query")
-                    .value_delimiter(' ')
-                    .takes_value(true),
-            ])
+            .args([create_query_arg()])
     }
 
     async fn process(&self, matches: &ArgMatches) -> CmdResult {

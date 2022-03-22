@@ -1,9 +1,11 @@
 use async_trait::async_trait;
+use clap::ArgMatches;
 
 pub use create::*;
 
-use crate::cmd::{CommandSetting, CommandTrait, create_cmd};
-use crate::cmd::note::config::{CMD_NODE_CONFIG, NodeConfigCommand};
+use crate::cmd::note::config::{NodeConfigCommand, CMD_NODE_CONFIG};
+use crate::cmd::{create_cmd, CommandSetting, CommandTrait};
+use crate::result::CmdResult;
 
 mod config;
 mod create;
@@ -33,5 +35,9 @@ impl NoteCommand {
 impl CommandTrait for NoteCommand {
     fn setting(&self) -> &CommandSetting {
         &self.setting
+    }
+
+    fn validate(&self, _matches: &ArgMatches) -> CmdResult {
+        Ok(())
     }
 }

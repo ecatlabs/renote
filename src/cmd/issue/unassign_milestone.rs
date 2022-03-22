@@ -1,11 +1,12 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use clap::{Arg, ArgMatches, Command};
+use clap::{ArgMatches, Command};
 use hubcaps_ex::issues::IssueOptions;
 use libcli_rs::progress::{ProgressBar, ProgressTrait};
 
-use crate::cmd::{CmdResult, CommandSetting, CommandTrait};
+use crate::cmd::arg::create_query_arg;
+use crate::cmd::{CmdResult, CommandTrait};
 use crate::component::repo::issue::IssueComponentTrait;
 use crate::component::repo::RepoComponent;
 use crate::config::NoteConfig;
@@ -22,23 +23,11 @@ impl UnassignMilestoneCommand {
 
 #[async_trait]
 impl CommandTrait for UnassignMilestoneCommand {
-    fn setting(&self) -> &CommandSetting {
-        unimplemented!()
-    }
-
     fn app<'help>(&self) -> Command<'help> {
         Command::new(CMD_UNASSIGN_MILESTONE)
             .about("Unassign issues from a milestone")
             .visible_alias("um")
-            .args([
-                Arg::new("query")
-                    .help("Issue filter query")
-                    .long_help("Issue query by https://docs.github.com/en/github/searching-for-information-on-github/searching-issues-and-pull-requests")
-                    .short('q')
-                    .long("query")
-                    .value_delimiter(' ')
-                    .takes_value(true),
-            ])
+            .args([create_query_arg()])
     }
 
     async fn process(&self, matches: &ArgMatches) -> CmdResult {

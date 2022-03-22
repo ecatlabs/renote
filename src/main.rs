@@ -5,14 +5,11 @@ extern crate libcli_rs;
 #[macro_use]
 extern crate maplit;
 
-use std::process::exit;
+use clap::{Arg, Command, Error, ErrorKind};
 
-use clap::{Arg, Command};
-
-use crate::cmd::{CmdGroup, create_cmd, get_app_matches};
 use crate::cmd::issue::*;
 use crate::cmd::note::*;
-use crate::result::CmdResult;
+use crate::cmd::{create_cmd, get_app_matches, CmdGroup};
 
 mod cmd;
 mod component;
@@ -79,24 +76,10 @@ async fn main() {
         ]);
 
     if let Some((cmd, matches)) = get_app_matches(app).subcommand() {
-        let cmd = commands.get(cmd).expect("command found");
-        if let Err(err) = error_handle([
-            cmd.validate(matches),
-            cmd.process(matches).await]
-        ) {
-            eprintln!("{:?}", err);
-            exit(1);
+        let cmd = commands.get(cmd).unwrap();
+
+        if let Err(err) = cmd.process(matches).await {
+            Error::raw(ErrorKind::Format, err).exit();
         }
     }
-}
-
-fn error_handle<T>(results: T) -> CmdResult
-    where T: IntoIterator<Item=CmdResult> {
-    for r in results {
-        if r.is_err() {
-            return r;
-        }
-    }
-
-    Ok(())
 }

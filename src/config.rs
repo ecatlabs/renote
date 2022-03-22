@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 pub struct NoteConfig {
     pub owner: String,
     pub repo: String,
+    #[serde(skip_serializing)]
     pub token: String,
     pub state: String,
     pub note: Option<String>,
